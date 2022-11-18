@@ -1,7 +1,7 @@
 ---
 title: Strong Assertions of IoT Network Access Requirements
 abbrev: SUIT MUD Linkage
-docname: draft-ietf-suit-mud-02
+docname: draft-ietf-suit-mud-03
 category: std
 
 ipr: pre5378Trust200902
@@ -75,7 +75,7 @@ There is a need to bind the entity that creates the software and configuration t
    BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
    capitals, as shown here.
 
-# Architecture
+# Workflow
 
 The intended workflow is as follows:
 
@@ -87,31 +87,52 @@ The intended workflow is as follows:
     * The MUD manager can then validate these attestation reports in order to check that the device is operating with the expected version of software and configuration.
     * Since the manifest digest is reported, the MUD manager can look up the corresponding manifest.
 * If the MUD manager does not already have a full copy of the manifest, it can be acquired using the reference URI.
-* Once a full copy of the manifest is provided, the MUD manager can verify the device attestation report and apply any appropriate policy as described by the MUD file.
+* Once a full copy of the manifest is provided, the MUD manager can verify the device attestation report
+* The MUD manager acquires the MUD file from the MUD url.
+* The MUD manager verifies the MUD file signature using the provided Subject Key Identifier.
+* Then, the MUD manager can apply any appropriate policy as described by the MUD file.
+
+# Advantages over previous MUD url reporting mechanisms
+
+Binding within the firmware manifest has several advantages over other MUD url reporting mechanisms:
+
+* The MUD url is tightly coupled to device firmware version.
+* The device does not report the url, so the device cannot tamper with the url.
+* The onus is placed on the software author to provide a MUD file that describes their device. 
+* The Manifest Author (software signer) explicitly authorizes a key to sign MUD files, providing a tight coupling between the party that knows device behavior best (the manifest author) and the party that declares device behavior (MUD file signer).
+* Network operators do not need to know, a priori, which MUD url to use for each device; this can be harvested from the device's manifest and only replaced if necessary.
+* A network operator can still replace a MUD url:
+
+  * By providing a manifest that overrides the MUD url.
+  * By replacing the MUD url in network infrastructure.
+
+* Devices can be quarantined if they do not attest a known software version.
+* Devices cannot lie about which MUD url to use.
 
 # Extensions to SUIT
 
-To enable strong assertions about the network access requirements that a device should have for a particular software/configuration pair, we include the ability to add MUD files to the SUIT manifest. However, there are also circumstances in which a device should allow the MUD to be changed without a firmware update. To enable this, we add a MUD url to SUIT along with a subject-key identifier, according to {{RFC7093}}, mechanism 4 (the keyIdentifier is composed of the hash of the DER encoding of the SubjectPublicKeyInfo value).
+To enable strong assertions about the network access requirements that a device should have for a particular software/configuration pair a MUD url is added to SUIT along with a subject-key identifier, according to {{RFC7093}}, mechanism 4 (the keyIdentifier is composed of the hash of the DER encoding of the SubjectPublicKeyInfo value). The Subject Key Identifier MUST be constructed with mechanism 4.
 
 The following CDDL describes the extension to the SUIT_Manifest structure:
 
 ~~~CDDL
-? suit-manifest-mud => SUIT_Digest
+$$severable-manifest-members-choice-extensions //= (
+  suit-manifest-mud => SUIT_Digest / SUIT_MUD_container
+)
 ~~~
 
 The SUIT_Envelope is also amended:
 
 ~~~CDDL
-? suit-manifest-mud => bstr .cbor SUIT_MUD_container
+$$SUIT_severable-members-extensions //= (
+  suit-manifest-mud => bstr .cbor SUIT_MUD_container
+)
 
 SUIT_MUD_container = {
-    ? suit-mud-url => #6.32(tstr),
-    ? suit-mud-ski => SUIT_Digest,
-    ? suit-mud-file => bstr
+    suit-mud-url => #6.32(tstr),
+    suit-mud-ski => SUIT_Digest,
 }
 ~~~
-
-The MUD file is included verbatim within the bstr. No limits are placed on the MUD file: it may be any RFC8520-compliant file.
 
 # Security Considerations
 
