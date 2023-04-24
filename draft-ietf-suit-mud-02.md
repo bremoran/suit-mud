@@ -144,8 +144,16 @@ This specification links MUD files to other IETF technologies, particularly to S
 
 # IANA Considerations
 
-IANA is requested to add a new value to the SUIT manifest elements registry created with {{I-D.ietf-suit-manifest}}
+IANA is requested to add a new value to the SUIT manifest elements registry created with {{I-D.ietf-suit-manifest}}:
 
-SUIT Envelope Elements
+- Label: TBD1 [[Value allocated from the standards action address range]]
+- Name: Manufacturer Usage Description (MUD)
+- Reference: [[TBD: This document]]
 
-suit-manifest-mud must be added as an extension point to the SUIT manifest registry.
+IANA is requested to add a new value to the SUIT envelope elements registry created with {{I-D.ietf-suit-manifest}}:
+
+- Label: TBD2 [[Value allocated from the standards action address range]]
+- Name: Manufacturer Usage Description (MUD)
+- Reference: [[TBD: This document]]
+
+
