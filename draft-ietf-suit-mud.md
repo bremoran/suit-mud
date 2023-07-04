@@ -42,6 +42,7 @@ normative:
   RFC8174:
   I-D.ietf-rats-eat:
   I-D.ietf-suit-manifest:
+  I-D.isobe-cose-key-thumbprint:
 
 --- abstract
 
@@ -111,7 +112,8 @@ Binding within the manifest has several advantages over other MUD URL reporting 
 
 # Extensions to SUIT {#suit-extension}
 
-To enable strong assertions about the network access requirements that a device should have for a particular software/configuration pair a MUD URL is added to the SUIT manifest along with a subject key identifier (ski). {{RFC7093}} defines several methods for generating key identifiers. Mechanism 4 from {{RFC7093}} MUST be used by this specification, whereby the keyIdentifier is composed of the hash of the DER encoding of the SubjectPublicKeyInfo value.
+To enable strong assertions about the network access requirements that a device should have for a particular software/configuration pair a MUD URL is added to the SUIT manifest along with a subject key identifier (ski).
+The subject key identifier MUST be generated according to the process defined in {{I-D.isobe-cose-key-thumbprint}}.
 
 The following CDDL describes the extension to the SUIT_Manifest structure:
 
