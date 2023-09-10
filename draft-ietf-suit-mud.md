@@ -141,7 +141,8 @@ This mechanism relies on the use of SUIT manifests to encode the MUD URL. Concep
 # Extensions to SUIT {#suit-extension}
 
 To enable strong assertions about the network access requirements that a device should have for a particular software/configuration pair a MUD URL is added to the SUIT manifest along with a subject key identifier (ski).
-The subject key identifier MUST be generated according to the process defined in {{I-D.ietf-cose-key-thumbprint}}.
+The subject key identifier MUST be generated according to the process defined in {{I-D.ietf-cose-key-thumbprint}} and the SUIT_Digest structure MUST be populated with the selected hash algorithm and obtained fingerprint.
+The subject key identifier corresponds to the key used in the MUD signature file described in Section 13.2 of {{RFC8520}}.
 
 The following CDDL describes the extension to the SUIT_Manifest structure:
 
