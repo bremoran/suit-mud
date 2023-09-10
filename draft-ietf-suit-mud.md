@@ -36,7 +36,6 @@ author:
       email: hannes.tschofenig@gmx.net
 
 normative:
-  RFC7093:
   RFC8520:
   RFC2119:
   RFC8174:
@@ -104,22 +103,23 @@ capitals, as shown here.
 
 The intended workflow is as follows:
 
-* At the time of onboarding, devices report their manifest in use to the MUD Manager via attestation evidence. This approach assumes that attestation evidence, which includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of {{I-D.ietf-rats-eat}}), can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).
+* At the time of onboarding, devices report their manifest in use to the MUD Manager via attestation evidence in the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}. 
+    * Among other claims, the device will report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager. This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of {{I-D.ietf-rats-eat}}) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).
+    * The MUD Manager can then (with the help of the Verifier) validate the evidence in order to check that the device is operating with the expected version of software and configuration.
+    * Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.
 * If the SUIT_MUD_container, see {{suit-extension}}, has been severed, the MUD Manager can use the suit-reference-uri to retrieve the complete SUIT manifest.
 * The manifest authenticity is verified by the MUD Manager, which enforces that the MUD file presented is also authentic and as intended by the device software vendor.
-* Each time a device is updated, rebooted, or otherwise substantially changed, it will execute an attestation.
-    * Among other claims in the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}, the device will report its software digest(s), configuration digest(s), manifest URI, and manifest digest to the MUD Manager.
-    * The MUD Manager can then validate these attestation reports in order to check that the device is operating with the expected version of software and configuration.
-    * Since the manifest digest is reported, the MUD Manager can look up the corresponding manifest.
-* If the MUD Manager does not already have a full copy of the manifest, it can be acquired using the reference URI.
-* Once a full copy of the manifest is provided, the MUD Manager can verify the device attestation report
-* The MUD Manager acquires the MUD file from the MUD URL.
-* The MUD Manager verifies the MUD file signature using the provided Subject Key Identifier (SKI).
+* The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest.
+* The MUD Manager verifies the MUD file signature using the Subject Key Identifier (SKI) provided in the SUIT manifest.
 * Then, the MUD Manager can apply any appropriate policy as described by the MUD file.
 
-# Advantages over previous MUD URL reporting mechanisms
+Each time a device is updated, rebooted, or otherwise substantially changed, it will execute the remote attestation procedures again.
 
-Binding within the manifest has several advantages over other MUD URL reporting mechanisms:
+# Operational Considerations
+
+## Pros
+
+The approach described in this document has several advantages over other MUD URL reporting mechanisms:
 
 * The MUD URL is tightly coupled to device software/firmware version.
 * The device does not report the MUD URL, so the device cannot tamper with the MUD URL.
@@ -133,6 +133,10 @@ Binding within the manifest has several advantages over other MUD URL reporting 
 
 * Devices can be quarantined if they do not attest a known software/firmware version.
 * Devices cannot lie about which MUD URL to use.
+
+## Cons
+
+This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself. The SUIT manifest must then be conveyed to the network during onboarding or during the network access authentication step. To accomplish the transport of the manifest attestation evidence is used, which needs to be available at the protocol of choice. 
 
 # Extensions to SUIT {#suit-extension}
 
