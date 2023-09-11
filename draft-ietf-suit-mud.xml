@@ -19,7 +19,7 @@
 <?rfc text-list-symbols="-o*+"?>
 <?rfc docmapping="yes"?>
 
-<rfc ipr="trust200902" docName="draft-ietf-suit-mud-04" category="std" consensus="true" tocInclude="true" sortRefs="true" symRefs="true">
+<rfc ipr="trust200902" docName="draft-ietf-suit-mud-05" category="std" consensus="true" tocInclude="true" sortRefs="true" symRefs="true">
   <front>
     <title abbrev="SUIT MUD Linkage">Strong Assertions of IoT Network Access Requirements</title>
 
@@ -36,7 +36,7 @@
       </address>
     </author>
 
-    <date year="2023" month="July" day="04"/>
+    <date year="2023" month="September" day="11"/>
 
     <area>Security</area>
     <workgroup>SUIT</workgroup>
@@ -64,7 +64,27 @@
 
 <section anchor="introduction"><name>Introduction</name>
 
-<t>Under <xref target="RFC8520"/>, devices report a URL to a MUD manager in the network. RFC 8520 envisions different approaches for conveying the information from the device to the network such as:</t>
+<t>Under <xref target="RFC8520"/>, devices report a MUD URL to a MUD Manager in the network, which then interacts with a MUD File Server
+to ultimately obtain the MUD file. The following figure shows the MUD architecture.</t>
+
+<figure><artwork><![CDATA[
+    .......................................
+    .                      ____________   .           _____________
+    .                     |            |  .          |             |
+    .                     |    MUD     |-->get URL-->|    MUD      |
+    .                     |  Manager   |  .(https)   | File Server |
+    .  End system network |____________|<-MUD file<-<|_____________|
+    .                             .       .
+    .                             .       .
+    . ________                _________   .
+    .|        |              | router  |  .
+    .| Device |--->MUD URL-->|   or    |  .
+    .|________|              | switch  |  .
+    .                        |_________|  .
+    .......................................
+]]></artwork></figure>
+
+<t>RFC 8520 envisions different approaches for conveying the MUD URL from the device to the network such as:</t>
 
 <t><list style="symbols">
   <t>DHCP,</t>
@@ -72,20 +92,24 @@
   <t>IEEE 802.1X whereby the URL to the MUD file would be contained in the certificate used in an EAP method.</t>
 </list></t>
 
-<t>The MUD manager then uses the URL to fetch the MUD file, which contains access and network functionality required for a device to properly function.</t>
+<t>The MUD Manager uses the MUD URL to fetch the MUD file, which contains connectivity-related functionality required for a device to properly function.</t>
 
-<t>The MUD manager must trust the service from which the MUD file is fetched to return an authentic copy of the MUD file. This concern may be mitigated using the optional signature reference in the MUD file. The MUD manager must also trust the device to report a correct URL. In case of DHCP and LLDP the URL is unprotected. When the URL to the MUD file is included in a certificate then it is authenticated and integrity protected. A certificate created for use with network access authentication is typically not signed by the entity that wrote the software and configured the device, which leads to conflation of local network access rights with rights to assert all network access requirements.</t>
+<t>The MUD Manager must trust the MUD File Server from which the MUD file is fetched to return an authentic copy of the MUD file. This concern may be mitigated using the optional signature reference in the MUD file. The MUD Manager must also trust the device to report a correct MUD URL. In case of DHCP and LLDP the URL is likely unprotected.</t>
 
-<t>There is a need to bind the entity that creates the software and configuration to the MUD file because only that entity can attest the network access requirements of the device. This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest format <xref target="I-D.ietf-suit-manifest"/> to include a MUD file (by reference or by value). When combining a MUD file with a manifest used for software/firmware updates (potentially augmented with attestation) then a network operator can get more confidence in the description of the access and network functionality required for a device to properly function.</t>
+<t>When the MUD URL is included in a certificate then it is authenticated and integrity protected. A certificate created for use with network access authentication is typically not signed by the entity that wrote the software and configured the device, which leads to a conflation of rights.</t>
+
+<t>There is a need to bind the entity that creates the software/configuration to the MUD file because only that entity can attest the connectivity requirements of the device.</t>
+
+<t>This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest format <xref target="I-D.ietf-suit-manifest"/> to include a MUD URL. When combining a MUD URL with a manifest used for software/firmware updates then a network operator can get more confidence in the description of the connectivity requirements for a device to properly function.</t>
 
 </section>
 <section anchor="terminology"><name>Terminology</name>
 
 <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in
-   BCP 14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only when, they appear in all
-   capitals, as shown here.</t>
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in
+BCP 14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only when, they appear in all
+capitals, as shown here.</t>
 
 </section>
 <section anchor="workflow"><name>Workflow</name>
@@ -93,35 +117,36 @@
 <t>The intended workflow is as follows:</t>
 
 <t><list style="symbols">
-  <t>At the time of onboarding, devices report their manifest in use to the MUD manager via attestation evidence.</t>
-  <t>If the SUIT_MUD_container, see <xref target="suit-extension"/>, has been severed, the MUD manager can use the suit-reference-uri to retrieve the complete SUIT manifest.</t>
-  <t>The manifest authenticity is verified by the MUD manager, which enforces that the MUD file presented is also authentic and as intended by the device software vendor.</t>
-  <t>Each time a device is updated, rebooted, or otherwise substantially changed, it will execute an attestation.
+  <t>At the time of onboarding, devices report their manifest in use to the MUD Manager via attestation evidence in the Entity Attestation Token (EAT) <xref target="I-D.ietf-rats-eat"/>.
   <list style="symbols">
-      <t>Among other claims in the Entity Attestation Token (EAT) <xref target="I-D.ietf-rats-eat"/>, the device will report its software digest(s), configuration digest(s), manifest URI, and manifest digest to the MUD manager.</t>
-      <t>The MUD manager can then validate these attestation reports in order to check that the device is operating with the expected version of software and configuration.</t>
-      <t>Since the manifest digest is reported, the MUD manager can look up the corresponding manifest.</t>
+      <t>Among other claims, the device will report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager. This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of <xref target="I-D.ietf-rats-eat"/>) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).</t>
+      <t>The MUD Manager can then (with the help of the Verifier) validate the evidence in order to check that the device is operating with the expected version of software and configuration.</t>
+      <t>Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.</t>
     </list></t>
-  <t>If the MUD manager does not already have a full copy of the manifest, it can be acquired using the reference URI.</t>
-  <t>Once a full copy of the manifest is provided, the MUD manager can verify the device attestation report</t>
-  <t>The MUD manager acquires the MUD file from the MUD URL.</t>
-  <t>The MUD manager verifies the MUD file signature using the provided Subject Key Identifier.</t>
-  <t>Then, the MUD manager can apply any appropriate policy as described by the MUD file.</t>
+  <t>If the SUIT_MUD_container, see <xref target="suit-extension"/>, has been severed, the MUD Manager can use the suit-reference-uri to retrieve the complete SUIT manifest.</t>
+  <t>The manifest authenticity is verified by the MUD Manager, which enforces that the MUD file presented is also authentic and as intended by the device software vendor.</t>
+  <t>The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest.</t>
+  <t>The MUD Manager verifies the MUD file signature using the Subject Key Identifier (SKI) provided in the SUIT manifest.</t>
+  <t>Then, the MUD Manager can apply any appropriate policy as described by the MUD file.</t>
 </list></t>
 
-</section>
-<section anchor="advantages-over-previous-mud-url-reporting-mechanisms"><name>Advantages over previous MUD URL reporting mechanisms</name>
+<t>Each time a device is updated, rebooted, or otherwise substantially changed, it will execute the remote attestation procedures again.</t>
 
-<t>Binding within the manifest has several advantages over other MUD URL reporting mechanisms:</t>
+</section>
+<section anchor="operational-considerations"><name>Operational Considerations</name>
+
+<section anchor="pros"><name>Pros</name>
+
+<t>The approach described in this document has several advantages over other MUD URL reporting mechanisms:</t>
 
 <t><list style="symbols">
   <t>The MUD URL is tightly coupled to device software/firmware version.</t>
-  <t>The device does not report the URL, so the device cannot tamper with the URL.</t>
+  <t>The device does not report the MUD URL, so the device cannot tamper with the MUD URL.</t>
   <t>The onus is placed on the software/firmware author to provide a MUD file that describes the behavior of the software running on a device.</t>
   <t>The author explicitly authorizes a key to sign MUD files, providing a tight coupling between the party that knows device behavior best (the author of the software/firmware) and the party that declares device behavior (MUD file signer).</t>
   <t>Network operators do not need to know, a priori, which MUD URL to use for each device; this can be harvested from the device's manifest and only replaced if necessary.</t>
-  <t>A network operator can still replace a MUD URL:  <list style="symbols">
-      <t>By providing a manifest that overrides the MUD URL.</t>
+  <t>A network operator can still replace a MUD URL in a SUIT manifest:  <list style="symbols">
+      <t>By providing a SUIT manifest that overrides the MUD URL.</t>
       <t>By replacing the MUD URL in their network infrastructure.</t>
     </list></t>
   <t>Devices can be quarantined if they do not attest a known software/firmware version.</t>
@@ -129,10 +154,17 @@
 </list></t>
 
 </section>
+<section anchor="cons"><name>Cons</name>
+
+<t>This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself. The SUIT manifest must then be conveyed to the network during onboarding or during the network access authentication step. To accomplish the transport of the manifest attestation evidence is used, which needs to be available at the protocol of choice.</t>
+
+</section>
+</section>
 <section anchor="suit-extension"><name>Extensions to SUIT</name>
 
 <t>To enable strong assertions about the network access requirements that a device should have for a particular software/configuration pair a MUD URL is added to the SUIT manifest along with a subject key identifier (ski).
-The subject key identifier MUST be generated according to the process defined in <xref target="I-D.isobe-cose-key-thumbprint"/>.</t>
+The subject key identifier MUST be generated according to the process defined in <xref target="I-D.ietf-cose-key-thumbprint"/> and the SUIT_Digest structure MUST be populated with the selected hash algorithm and obtained fingerprint.
+The subject key identifier corresponds to the key used in the MUD signature file described in Section 13.2 of <xref target="RFC8520"/>.</t>
 
 <t>The following CDDL describes the extension to the SUIT_Manifest structure:</t>
 
@@ -162,7 +194,7 @@ SUIT_MUD_container = {
 </section>
 <section anchor="security-considerations"><name>Security Considerations</name>
 
-<t>This specification links MUD files to other IETF technologies, particularly to SUIT manifests, for improving security protection and ease of use. By including MUD files (by reference or by value) in SUIT manifests an extra layer of protection has been created and synchronization risks can be minimized. If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning.</t>
+<t>This specification links MUD files to SUIT manifests for improving security protection and ease of use. By including MUD URLs in SUIT manifests an extra layer of protection has been created and synchronization risks can be minimized. If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning.</t>
 
 </section>
 <section anchor="iana-considerations"><name>IANA Considerations</name>
@@ -194,21 +226,6 @@ SUIT_MUD_container = {
     <references title='Normative References'>
 
 
-
-<reference anchor='RFC7093'>
-  <front>
-    <title>Additional Methods for Generating Key Identifiers Values</title>
-    <author fullname='S. Turner' initials='S.' surname='Turner'/>
-    <author fullname='S. Kent' initials='S.' surname='Kent'/>
-    <author fullname='J. Manger' initials='J.' surname='Manger'/>
-    <date month='December' year='2013'/>
-    <abstract>
-      <t>This document specifies additional example methods for generating Key Identifier values for use in the AKI (Authority Key Identifier) and SKI (Subject Key Identifier) certificate extensions.</t>
-    </abstract>
-  </front>
-  <seriesInfo name='RFC' value='7093'/>
-  <seriesInfo name='DOI' value='10.17487/RFC7093'/>
-</reference>
 
 <reference anchor='RFC8520'>
   <front>
@@ -296,8 +313,7 @@ SUIT_MUD_container = {
          <organization>Arm Limited</organization>
       </author>
       <author fullname='Hannes Tschofenig' initials='H.' surname='Tschofenig'>
-         <organization>Arm Limited</organization>
-      </author>
+         </author>
       <author fullname='Henk Birkholz' initials='H.' surname='Birkholz'>
          <organization>Fraunhofer SIT</organization>
       </author>
@@ -307,26 +323,25 @@ SUIT_MUD_container = {
       <author fullname='Øyvind Rønningstad' initials='O.' surname='Rønningstad'>
          <organization>Nordic Semiconductor</organization>
       </author>
-      <date day='27' month='February' year='2023'/>
+      <date day='10' month='September' year='2023'/>
       <abstract>
 	 <t>   This specification describes the format of a manifest.  A manifest is
    a bundle of metadata about code/data obtained by a recipient (chiefly
-   the firmware for an IoT device), where to find the that code/data,
-   the devices to which it applies, and cryptographic information
-   protecting the manifest.  Software updates and Trusted Invocation
-   both tend to use sequences of common operations, so the manifest
-   encodes those sequences of operations, rather than declaring the
-   metadata.
+   the firmware for an IoT device), where to find the code/data, the
+   devices to which it applies, and cryptographic information protecting
+   the manifest.  Software updates and Trusted Invocation both tend to
+   use sequences of common operations, so the manifest encodes those
+   sequences of operations, rather than declaring the metadata.
 
 	 </t>
       </abstract>
    </front>
-   <seriesInfo name='Internet-Draft' value='draft-ietf-suit-manifest-22'/>
+   <seriesInfo name='Internet-Draft' value='draft-ietf-suit-manifest-23'/>
    
 </reference>
 
 
-<reference anchor='I-D.isobe-cose-key-thumbprint'>
+<reference anchor='I-D.ietf-cose-key-thumbprint'>
    <front>
       <title>COSE Key Thumbprint</title>
       <author fullname='Kohei Isobe' initials='K.' surname='Isobe'>
@@ -334,7 +349,7 @@ SUIT_MUD_container = {
       </author>
       <author fullname='Hannes Tschofenig' initials='H.' surname='Tschofenig'>
          </author>
-      <date day='16' month='June' year='2023'/>
+      <date day='7' month='August' year='2023'/>
       <abstract>
 	 <t>   This specification defines a method for computing a hash value over a
    COSE Key. It defines which fields in a COSE Key structure are used in
@@ -346,7 +361,7 @@ SUIT_MUD_container = {
 	 </t>
       </abstract>
    </front>
-   <seriesInfo name='Internet-Draft' value='draft-isobe-cose-key-thumbprint-02'/>
+   <seriesInfo name='Internet-Draft' value='draft-ietf-cose-key-thumbprint-01'/>
    
 </reference>
 
@@ -361,77 +376,90 @@ SUIT_MUD_container = {
   </back>
 
 <!-- ##markdown-source:
-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
-+DoEgf97RFTDRL9XRE7+zyKS/QcTLq7ihCAAAA==
+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
+AAA=
 
 -->
 

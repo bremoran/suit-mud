@@ -14,10 +14,10 @@
     " name="description">
 <meta content="xml2rfc 3.17.1" name="generator">
 <meta content="Internet-Draft" name="keyword">
-<meta content="draft-ietf-suit-mud-04" name="ietf.draft">
+<meta content="draft-ietf-suit-mud-05" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.17.1
-    Python 3.11.3
+    Python 3.11.5
     appdirs 1.4.4
     ConfigArgParse 1.5.3
     google-i18n-address 2.5.2
@@ -27,7 +27,7 @@
     pycountry 22.3.5
     PyYAML 6.0
     requests 2.28.2
-    setuptools 67.6.1
+    setuptools 68.1.2
     six 1.16.0
     wcwidth 0.2.6
 -->
@@ -1205,11 +1205,11 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">SUIT MUD Linkage</td>
-<td class="right">July 2023</td>
+<td class="right">September 2023</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Moran &amp; Tschofenig</td>
-<td class="center">Expires 5 January 2024</td>
+<td class="center">Expires 14 March 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1219,15 +1219,15 @@ li > p:last-of-type:only-child {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">SUIT</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-ietf-suit-mud-04</dd>
+<dd class="internet-draft">draft-ietf-suit-mud-05</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-07-04" class="published">4 July 2023</time>
+<time datetime="2023-09-11" class="published">11 September 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-01-05">5 January 2024</time></dd>
+<dd class="expires"><time datetime="2024-03-14">14 March 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1266,7 +1266,7 @@ li > p:last-of-type:only-child {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 5 January 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 14 March 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1305,7 +1305,15 @@ li > p:last-of-type:only-child {
             <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-workflow" class="internal xref">Workflow</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-advantages-over-previous-mu" class="internal xref">Advantages over previous MUD URL reporting mechanisms</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-operational-considerations" class="internal xref">Operational Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-pros" class="internal xref">Pros</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-cons" class="internal xref">Cons</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-extensions-to-suit" class="internal xref">Extensions to SUIT</a></p>
@@ -1331,18 +1339,40 @@ li > p:last-of-type:only-child {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Under <span>[<a href="#RFC8520" class="cite xref">RFC8520</a>]</span>, devices report a URL to a MUD manager in the network. RFC 8520 envisions different approaches for conveying the information from the device to the network such as:<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">Under <span>[<a href="#RFC8520" class="cite xref">RFC8520</a>]</span>, devices report a MUD URL to a MUD Manager in the network, which then interacts with a MUD File Server
+to ultimately obtain the MUD file. The following figure shows the MUD architecture.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-1-2">
+<pre>
+    .......................................
+    .                      ____________   .           _____________
+    .                     |            |  .          |             |
+    .                     |    MUD     |--&gt;get URL--&gt;|    MUD      |
+    .                     |  Manager   |  .(https)   | File Server |
+    .  End system network |____________|&lt;-MUD file&lt;-&lt;|_____________|
+    .                             .       .
+    .                             .       .
+    . ________                _________   .
+    .|        |              | router  |  .
+    .| Device |---&gt;MUD URL--&gt;|   or    |  .
+    .|________|              | switch  |  .
+    .                        |_________|  .
+    .......................................
+</pre><a href="#section-1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-1-3">RFC 8520 envisions different approaches for conveying the MUD URL from the device to the network such as:<a href="#section-1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-1-2.1">DHCP,<a href="#section-1-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-1-4.1">DHCP,<a href="#section-1-4.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-1-2.2">IEEE802.1AB Link Layer Discovery Protocol (LLDP), and<a href="#section-1-2.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-4.2">IEEE802.1AB Link Layer Discovery Protocol (LLDP), and<a href="#section-1-4.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-1-2.3">IEEE 802.1X whereby the URL to the MUD file would be contained in the certificate used in an EAP method.<a href="#section-1-2.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-4.3">IEEE 802.1X whereby the URL to the MUD file would be contained in the certificate used in an EAP method.<a href="#section-1-4.3" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-1-3">The MUD manager then uses the URL to fetch the MUD file, which contains access and network functionality required for a device to properly function.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">The MUD manager must trust the service from which the MUD file is fetched to return an authentic copy of the MUD file. This concern may be mitigated using the optional signature reference in the MUD file. The MUD manager must also trust the device to report a correct URL. In case of DHCP and LLDP the URL is unprotected. When the URL to the MUD file is included in a certificate then it is authenticated and integrity protected. A certificate created for use with network access authentication is typically not signed by the entity that wrote the software and configured the device, which leads to conflation of local network access rights with rights to assert all network access requirements.<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">There is a need to bind the entity that creates the software and configuration to the MUD file because only that entity can attest the network access requirements of the device. This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest format <span>[<a href="#I-D.ietf-suit-manifest" class="cite xref">I-D.ietf-suit-manifest</a>]</span> to include a MUD file (by reference or by value). When combining a MUD file with a manifest used for software/firmware updates (potentially augmented with attestation) then a network operator can get more confidence in the description of the access and network functionality required for a device to properly function.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-5">The MUD Manager uses the MUD URL to fetch the MUD file, which contains connectivity-related functionality required for a device to properly function.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">The MUD Manager must trust the MUD File Server from which the MUD file is fetched to return an authentic copy of the MUD file. This concern may be mitigated using the optional signature reference in the MUD file. The MUD Manager must also trust the device to report a correct MUD URL. In case of DHCP and LLDP the URL is likely unprotected.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-7">When the MUD URL is included in a certificate then it is authenticated and integrity protected. A certificate created for use with network access authentication is typically not signed by the entity that wrote the software and configured the device, which leads to a conflation of rights.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-8">There is a need to bind the entity that creates the software/configuration to the MUD file because only that entity can attest the connectivity requirements of the device.<a href="#section-1-8" class="pilcrow">¶</a></p>
+<p id="section-1-9">This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest format <span>[<a href="#I-D.ietf-suit-manifest" class="cite xref">I-D.ietf-suit-manifest</a>]</span> to include a MUD URL. When combining a MUD URL with a manifest used for software/firmware updates then a network operator can get more confidence in the description of the connectivity requirements for a device to properly function.<a href="#section-1-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="terminology">
@@ -1351,10 +1381,10 @@ li > p:last-of-type:only-child {
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
       </h2>
 <p id="section-2-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in
-   BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they appear in all
-   capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in
+BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they appear in all
+capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="workflow">
@@ -1364,67 +1394,77 @@ li > p:last-of-type:only-child {
       </h2>
 <p id="section-3-1">The intended workflow is as follows:<a href="#section-3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3-2.1">At the time of onboarding, devices report their manifest in use to the MUD manager via attestation evidence.<a href="#section-3-2.1" class="pilcrow">¶</a>
-</li>
-        <li class="normal" id="section-3-2.2">If the SUIT_MUD_container, see <a href="#suit-extension" class="auto internal xref">Section 5</a>, has been severed, the MUD manager can use the suit-reference-uri to retrieve the complete SUIT manifest.<a href="#section-3-2.2" class="pilcrow">¶</a>
-</li>
-        <li class="normal" id="section-3-2.3">The manifest authenticity is verified by the MUD manager, which enforces that the MUD file presented is also authentic and as intended by the device software vendor.<a href="#section-3-2.3" class="pilcrow">¶</a>
-</li>
-        <li class="normal" id="section-3-2.4">
-          <p id="section-3-2.4.1">Each time a device is updated, rebooted, or otherwise substantially changed, it will execute an attestation.<a href="#section-3-2.4.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3-2.1">
+          <p id="section-3-2.1.1">At the time of onboarding, devices report their manifest in use to the MUD Manager via attestation evidence in the Entity Attestation Token (EAT) <span>[<a href="#I-D.ietf-rats-eat" class="cite xref">I-D.ietf-rats-eat</a>]</span>.<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3-2.4.2.1">Among other claims in the Entity Attestation Token (EAT) <span>[<a href="#I-D.ietf-rats-eat" class="cite xref">I-D.ietf-rats-eat</a>]</span>, the device will report its software digest(s), configuration digest(s), manifest URI, and manifest digest to the MUD manager.<a href="#section-3-2.4.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-3-2.1.2.1">Among other claims, the device will report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager. This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of <span>[<a href="#I-D.ietf-rats-eat" class="cite xref">I-D.ietf-rats-eat</a>]</span>) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).<a href="#section-3-2.1.2.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-3-2.4.2.2">The MUD manager can then validate these attestation reports in order to check that the device is operating with the expected version of software and configuration.<a href="#section-3-2.4.2.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-3-2.1.2.2">The MUD Manager can then (with the help of the Verifier) validate the evidence in order to check that the device is operating with the expected version of software and configuration.<a href="#section-3-2.1.2.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-3-2.4.2.3">Since the manifest digest is reported, the MUD manager can look up the corresponding manifest.<a href="#section-3-2.4.2.3" class="pilcrow">¶</a>
+            <li class="normal" id="section-3-2.1.2.3">Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.<a href="#section-3-2.1.2.3" class="pilcrow">¶</a>
 </li>
           </ul>
 </li>
-        <li class="normal" id="section-3-2.5">If the MUD manager does not already have a full copy of the manifest, it can be acquired using the reference URI.<a href="#section-3-2.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.2">If the SUIT_MUD_container, see <a href="#suit-extension" class="auto internal xref">Section 5</a>, has been severed, the MUD Manager can use the suit-reference-uri to retrieve the complete SUIT manifest.<a href="#section-3-2.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-2.6">Once a full copy of the manifest is provided, the MUD manager can verify the device attestation report<a href="#section-3-2.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.3">The manifest authenticity is verified by the MUD Manager, which enforces that the MUD file presented is also authentic and as intended by the device software vendor.<a href="#section-3-2.3" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-2.7">The MUD manager acquires the MUD file from the MUD URL.<a href="#section-3-2.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.4">The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest.<a href="#section-3-2.4" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-2.8">The MUD manager verifies the MUD file signature using the provided Subject Key Identifier.<a href="#section-3-2.8" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.5">The MUD Manager verifies the MUD file signature using the Subject Key Identifier (SKI) provided in the SUIT manifest.<a href="#section-3-2.5" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-2.9">Then, the MUD manager can apply any appropriate policy as described by the MUD file.<a href="#section-3-2.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-2.6">Then, the MUD Manager can apply any appropriate policy as described by the MUD file.<a href="#section-3-2.6" class="pilcrow">¶</a>
 </li>
       </ul>
+<p id="section-3-3">Each time a device is updated, rebooted, or otherwise substantially changed, it will execute the remote attestation procedures again.<a href="#section-3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="advantages-over-previous-mud-url-reporting-mechanisms">
+<div id="operational-considerations">
 <section id="section-4">
-      <h2 id="name-advantages-over-previous-mu">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-advantages-over-previous-mu" class="section-name selfRef">Advantages over previous MUD URL reporting mechanisms</a>
+      <h2 id="name-operational-considerations">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-operational-considerations" class="section-name selfRef">Operational Considerations</a>
       </h2>
-<p id="section-4-1">Binding within the manifest has several advantages over other MUD URL reporting mechanisms:<a href="#section-4-1" class="pilcrow">¶</a></p>
+<div id="pros">
+<section id="section-4.1">
+        <h3 id="name-pros">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-pros" class="section-name selfRef">Pros</a>
+        </h3>
+<p id="section-4.1-1">The approach described in this document has several advantages over other MUD URL reporting mechanisms:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4-2.1">The MUD URL is tightly coupled to device software/firmware version.<a href="#section-4-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.1-2.1">The MUD URL is tightly coupled to device software/firmware version.<a href="#section-4.1-2.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-4-2.2">The device does not report the URL, so the device cannot tamper with the URL.<a href="#section-4-2.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.2">The device does not report the MUD URL, so the device cannot tamper with the MUD URL.<a href="#section-4.1-2.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-4-2.3">The onus is placed on the software/firmware author to provide a MUD file that describes the behavior of the software running on a device.<a href="#section-4-2.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.3">The onus is placed on the software/firmware author to provide a MUD file that describes the behavior of the software running on a device.<a href="#section-4.1-2.3" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-4-2.4">The author explicitly authorizes a key to sign MUD files, providing a tight coupling between the party that knows device behavior best (the author of the software/firmware) and the party that declares device behavior (MUD file signer).<a href="#section-4-2.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.4">The author explicitly authorizes a key to sign MUD files, providing a tight coupling between the party that knows device behavior best (the author of the software/firmware) and the party that declares device behavior (MUD file signer).<a href="#section-4.1-2.4" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-4-2.5">Network operators do not need to know, a priori, which MUD URL to use for each device; this can be harvested from the device's manifest and only replaced if necessary.<a href="#section-4-2.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.5">Network operators do not need to know, a priori, which MUD URL to use for each device; this can be harvested from the device's manifest and only replaced if necessary.<a href="#section-4.1-2.5" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-4-2.6">
-          <p id="section-4-2.6.1">A network operator can still replace a MUD URL:<a href="#section-4-2.6.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-4.1-2.6">
+            <p id="section-4.1-2.6.1">A network operator can still replace a MUD URL in a SUIT manifest:<a href="#section-4.1-2.6.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4-2.6.2.1">By providing a manifest that overrides the MUD URL.<a href="#section-4-2.6.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.1-2.6.2.1">By providing a SUIT manifest that overrides the MUD URL.<a href="#section-4.1-2.6.2.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-4-2.6.2.2">By replacing the MUD URL in their network infrastructure.<a href="#section-4-2.6.2.2" class="pilcrow">¶</a>
+              <li class="normal" id="section-4.1-2.6.2.2">By replacing the MUD URL in their network infrastructure.<a href="#section-4.1-2.6.2.2" class="pilcrow">¶</a>
 </li>
-          </ul>
+            </ul>
 </li>
-        <li class="normal" id="section-4-2.7">Devices can be quarantined if they do not attest a known software/firmware version.<a href="#section-4-2.7" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.7">Devices can be quarantined if they do not attest a known software/firmware version.<a href="#section-4.1-2.7" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-4-2.8">Devices cannot lie about which MUD URL to use.<a href="#section-4-2.8" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.8">Devices cannot lie about which MUD URL to use.<a href="#section-4.1-2.8" class="pilcrow">¶</a>
 </li>
-      </ul>
+        </ul>
+</section>
+</div>
+<div id="cons">
+<section id="section-4.2">
+        <h3 id="name-cons">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-cons" class="section-name selfRef">Cons</a>
+        </h3>
+<p id="section-4.2-1">This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself. The SUIT manifest must then be conveyed to the network during onboarding or during the network access authentication step. To accomplish the transport of the manifest attestation evidence is used, which needs to be available at the protocol of choice.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="suit-extension">
@@ -1433,7 +1473,8 @@ li > p:last-of-type:only-child {
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-extensions-to-suit" class="section-name selfRef">Extensions to SUIT</a>
       </h2>
 <p id="section-5-1">To enable strong assertions about the network access requirements that a device should have for a particular software/configuration pair a MUD URL is added to the SUIT manifest along with a subject key identifier (ski).
-The subject key identifier MUST be generated according to the process defined in <span>[<a href="#I-D.isobe-cose-key-thumbprint" class="cite xref">I-D.isobe-cose-key-thumbprint</a>]</span>.<a href="#section-5-1" class="pilcrow">¶</a></p>
+The subject key identifier MUST be generated according to the process defined in <span>[<a href="#I-D.ietf-cose-key-thumbprint" class="cite xref">I-D.ietf-cose-key-thumbprint</a>]</span> and the SUIT_Digest structure MUST be populated with the selected hash algorithm and obtained fingerprint.
+The subject key identifier corresponds to the key used in the MUD signature file described in Section 13.2 of <span>[<a href="#RFC8520" class="cite xref">RFC8520</a>]</span>.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <p id="section-5-2">The following CDDL describes the extension to the SUIT_Manifest structure:<a href="#section-5-2" class="pilcrow">¶</a></p>
 <div class="lang-CDDL sourcecode" id="section-5-3">
 <pre>
@@ -1466,7 +1507,7 @@ SUIT_MUD_container = {
       <h2 id="name-security-considerations">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-6-1">This specification links MUD files to other IETF technologies, particularly to SUIT manifests, for improving security protection and ease of use. By including MUD files (by reference or by value) in SUIT manifests an extra layer of protection has been created and synchronization risks can be minimized. If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">This specification links MUD files to SUIT manifests for improving security protection and ease of use. By including MUD URLs in SUIT manifests an extra layer of protection has been created and synchronization risks can be minimized. If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning.<a href="#section-6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
@@ -1499,25 +1540,21 @@ SUIT_MUD_container = {
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
       </h2>
 <dl class="references">
+<dt id="I-D.ietf-cose-key-thumbprint">[I-D.ietf-cose-key-thumbprint]</dt>
+      <dd>
+<span class="refAuthor">Isobe, K.</span> and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"COSE Key Thumbprint"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-cose-key-thumbprint-01</span>, <time datetime="2023-08-07" class="refDate">7 August 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-01">https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="I-D.ietf-rats-eat">[I-D.ietf-rats-eat]</dt>
       <dd>
 <span class="refAuthor">Lundblade, L.</span>, <span class="refAuthor">Mandyam, G.</span>, <span class="refAuthor">O'Donoghue, J.</span>, and <span class="refAuthor">C. Wallace</span>, <span class="refTitle">"The Entity Attestation Token (EAT)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-eat-21</span>, <time datetime="2023-06-30" class="refDate">30 June 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-21">https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-21</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-suit-manifest">[I-D.ietf-suit-manifest]</dt>
       <dd>
-<span class="refAuthor">Moran, B.</span>, <span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Zandberg, K.</span>, and <span class="refAuthor">O. Rønningstad</span>, <span class="refTitle">"A Concise Binary Object Representation (CBOR)-based Serialization Format for the Software Updates for Internet of Things (SUIT) Manifest"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-suit-manifest-22</span>, <time datetime="2023-02-27" class="refDate">27 February 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-suit-manifest-22">https://datatracker.ietf.org/doc/html/draft-ietf-suit-manifest-22</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="I-D.isobe-cose-key-thumbprint">[I-D.isobe-cose-key-thumbprint]</dt>
-      <dd>
-<span class="refAuthor">Isobe, K.</span> and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"COSE Key Thumbprint"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-isobe-cose-key-thumbprint-02</span>, <time datetime="2023-06-16" class="refDate">16 June 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-isobe-cose-key-thumbprint-02">https://datatracker.ietf.org/doc/html/draft-isobe-cose-key-thumbprint-02</a>&gt;</span>. </dd>
+<span class="refAuthor">Moran, B.</span>, <span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Zandberg, K.</span>, and <span class="refAuthor">O. Rønningstad</span>, <span class="refTitle">"A Concise Binary Object Representation (CBOR)-based Serialization Format for the Software Updates for Internet of Things (SUIT) Manifest"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-suit-manifest-23</span>, <time datetime="2023-09-10" class="refDate">10 September 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-suit-manifest-23">https://datatracker.ietf.org/doc/html/draft-ietf-suit-manifest-23</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
       <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC7093">[RFC7093]</dt>
-      <dd>
-<span class="refAuthor">Turner, S.</span>, <span class="refAuthor">Kent, S.</span>, and <span class="refAuthor">J. Manger</span>, <span class="refTitle">"Additional Methods for Generating Key Identifiers Values"</span>, <span class="seriesInfo">RFC 7093</span>, <span class="seriesInfo">DOI 10.17487/RFC7093</span>, <time datetime="2013-12" class="refDate">December 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7093">https://www.rfc-editor.org/rfc/rfc7093</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
       <dd>
