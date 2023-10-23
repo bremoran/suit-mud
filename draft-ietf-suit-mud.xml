@@ -19,7 +19,7 @@
 <?rfc text-list-symbols="-o*+"?>
 <?rfc docmapping="yes"?>
 
-<rfc ipr="trust200902" docName="draft-ietf-suit-mud-05" category="std" consensus="true" tocInclude="true" sortRefs="true" symRefs="true">
+<rfc ipr="trust200902" docName="draft-ietf-suit-mud-06" category="std" consensus="true" tocInclude="true" sortRefs="true" symRefs="true">
   <front>
     <title abbrev="SUIT MUD Linkage">Strong Assertions of IoT Network Access Requirements</title>
 
@@ -36,7 +36,7 @@
       </address>
     </author>
 
-    <date year="2023" month="September" day="11"/>
+    <date year="2023" month="October" day="23"/>
 
     <area>Security</area>
     <workgroup>SUIT</workgroup>
@@ -114,12 +114,13 @@ capitals, as shown here.</t>
 </section>
 <section anchor="workflow"><name>Workflow</name>
 
-<t>The intended workflow is as follows:</t>
+<t>The intended workflow is as follows, and assumes an attestation mechanism between the device and the MUD Manager:</t>
 
 <t><list style="symbols">
-  <t>At the time of onboarding, devices report their manifest in use to the MUD Manager via attestation evidence in the Entity Attestation Token (EAT) <xref target="I-D.ietf-rats-eat"/>.
+  <t>At the time of onboarding, devices report their manifest in use to the MUD Manager via some form of attestation evidence and a conveyance protocol.  The normative specification of these mechanisms is out of scope for this document. 
+.
   <list style="symbols">
-      <t>Among other claims, the device will report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager. This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of <xref target="I-D.ietf-rats-eat"/>) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).</t>
+      <t>An example of an attestation evidence format is the Entity Attestation Token (EAT) <xref target="I-D.ietf-rats-eat"/>.  Among other claims, the device could report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager.  This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of <xref target="I-D.ietf-rats-eat"/>) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).</t>
       <t>The MUD Manager can then (with the help of the Verifier) validate the evidence in order to check that the device is operating with the expected version of software and configuration.</t>
       <t>Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.</t>
     </list></t>
@@ -287,13 +288,13 @@ SUIT_MUD_container = {
       <author fullname='Carl Wallace' initials='C.' surname='Wallace'>
          <organization>Red Hound Software, Inc.</organization>
       </author>
-      <date day='30' month='June' year='2023'/>
+      <date day='14' month='October' year='2023'/>
       <abstract>
 	 <t>   An Entity Attestation Token (EAT) provides an attested claims set
    that describes state and characteristics of an entity, a device like
    a smartphone, IoT device, network equipment or such.  This claims set
-   is used by a relying party, server or service to determine how much
-   it wishes to trust the entity.
+   is used by a relying party, server or service to determine the type
+   and degree of trust placed in the entity.
 
    An EAT is either a CBOR Web Token (CWT) or JSON Web Token (JWT) with
    attestation-oriented claims.
@@ -301,7 +302,7 @@ SUIT_MUD_container = {
 	 </t>
       </abstract>
    </front>
-   <seriesInfo name='Internet-Draft' value='draft-ietf-rats-eat-21'/>
+   <seriesInfo name='Internet-Draft' value='draft-ietf-rats-eat-22'/>
    
 </reference>
 
@@ -323,7 +324,7 @@ SUIT_MUD_container = {
       <author fullname='Øyvind Rønningstad' initials='O.' surname='Rønningstad'>
          <organization>Nordic Semiconductor</organization>
       </author>
-      <date day='10' month='September' year='2023'/>
+      <date day='23' month='October' year='2023'/>
       <abstract>
 	 <t>   This specification describes the format of a manifest.  A manifest is
    a bundle of metadata about code/data obtained by a recipient (chiefly
@@ -336,20 +337,23 @@ SUIT_MUD_container = {
 	 </t>
       </abstract>
    </front>
-   <seriesInfo name='Internet-Draft' value='draft-ietf-suit-manifest-23'/>
+   <seriesInfo name='Internet-Draft' value='draft-ietf-suit-manifest-24'/>
    
 </reference>
 
 
 <reference anchor='I-D.ietf-cose-key-thumbprint'>
    <front>
-      <title>COSE Key Thumbprint</title>
+      <title>CBOR Object Signing and Encryption (COSE) Key Thumbprint</title>
       <author fullname='Kohei Isobe' initials='K.' surname='Isobe'>
          <organization>SECOM CO., LTD.</organization>
       </author>
       <author fullname='Hannes Tschofenig' initials='H.' surname='Tschofenig'>
          </author>
-      <date day='7' month='August' year='2023'/>
+      <author fullname='Orie Steele' initials='O.' surname='Steele'>
+         <organization>Transmute</organization>
+      </author>
+      <date day='23' month='October' year='2023'/>
       <abstract>
 	 <t>   This specification defines a method for computing a hash value over a
    COSE Key. It defines which fields in a COSE Key structure are used in
@@ -361,7 +365,7 @@ SUIT_MUD_container = {
 	 </t>
       </abstract>
    </front>
-   <seriesInfo name='Internet-Draft' value='draft-ietf-cose-key-thumbprint-01'/>
+   <seriesInfo name='Internet-Draft' value='draft-ietf-cose-key-thumbprint-04'/>
    
 </reference>
 
@@ -376,90 +380,92 @@ SUIT_MUD_container = {
   </back>
 
 <!-- ##markdown-source:
-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
-AAA=
+H4sIAAAAAAAAA81aa3PbyLH9jl8xZafqShuRazubl+7u1qUsba0qkuXYUh6V
+SrmGwJCcCMAgMwNpubb2t+d0zwMARXudVD5cfbBJYDDTz9OnG5zNZoXXvlbH
+4q23pl2LhXPKem1aJ8xKnJtr8Ur5e2NvxaIslXPijfpnr61qVOtdIZdLq+7w
+8M35tbi8ORUXur2Va1VUpmxlg20rK1d+ppVfzVyv/azpq9mz3xSl9Gpt7PZY
+OF8Vhe7ssfC2d/7Fs2e/f/aikFZJbKvK3mq/LUiAtTV9F44qbtUWl6pjcd56
+ZVvlZ6d0TlE4L9vqnaxNi7O3yhWdPi6EsKtSVc5v63hVCG/K0UfdVtAnXXDG
+eqtWLn/fNpOv3uoyLy5Nw7ZI33Vb63Y4Rv3gZ7V2foZNlqbGspn54pe4Aws1
+sut0uw5rC9n7jbGQdoa79KdbrD6Zi0tjZRuvBaOeWNVWsp3cMXYtW/2jJN8d
+i4Vt4ItGe1XF+6qRuj4Wy/DovKFH5+SX/1vTnTn0KHbO/n4url25MSvV6vVE
+gO9l2yr3+O5UiOnJG35m7vMzOPiHOXxXFK2xDZ65U+SrN9+9/N2vXzyLH188
+f/77dPX5b7+ij+ezUxZ8ZqV3MyX95GKIMkixUm56pzROzRA5M7/pm2VnNTxe
+FLPZTMglfCpLSHK9UeJStv0K33qrrLhxCGdxqlxpdUdqiQPE+aFwnSr1Spes
+qqj4/hIm8dhAhkxBJIo2Js+qb0taKWuEs7AhhyqxMlZIPH2nS4U4FJ01nbL1
+Nq+HB0giZFY1EmEjHa1GUNaq9HymMyt/j6wRtm9bBJXAMroe9yZZtHeI1nal
+172VYfMTVcreKUp1v9HuiB9pjPMCoQlZrEaeCoQ3SU3CRkXpgLhz0jAqbUfw
+IHSwh0PMCBk+x73wsKoNRf9U+v1yFsUin9NZ5bAJjHev/QbWI+OsdK3EcjvY
+Uta1uXf45hXbkTRstFuqjbzT0ANrR9aZHD85mp6LmuE6ILKeU5BAMeRvT1pi
+j5WmZJDiXm7JLch/mCNgYgpEuj4S1axWypLyktAEuItIg1ErurSEokoF70Hl
+eQjRRldVrYriKUGeNVXPahXFDZDLivfvY9Y8PBxFpcgVHYAsHnvz5mKQAREu
+6UgdTommPRL3G11u6FKLWwBWJIEbm/k7kv2tsnfKFtisr71G3irEq1l6GXdL
+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
+AA==
 
 -->
 

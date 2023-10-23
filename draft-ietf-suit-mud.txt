@@ -5,11 +5,11 @@
 SUIT                                                            B. Moran
 Internet-Draft                                               Arm Limited
 Intended status: Standards Track                           H. Tschofenig
-Expires: 14 March 2024                                 11 September 2023
+Expires: 25 April 2024                                   23 October 2023
 
 
           Strong Assertions of IoT Network Access Requirements
-                         draft-ietf-suit-mud-05
+                         draft-ietf-suit-mud-06
 
 Abstract
 
@@ -43,7 +43,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 March 2024.
+   This Internet-Draft will expire on 25 April 2024.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Moran & Tschofenig        Expires 14 March 2024                 [Page 1]
+Moran & Tschofenig        Expires 25 April 2024                 [Page 1]
 
-Internet-Draft              SUIT MUD Linkage              September 2023
+Internet-Draft              SUIT MUD Linkage                October 2023
 
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -73,7 +73,7 @@ Table of Contents
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
    3.  Workflow  . . . . . . . . . . . . . . . . . . . . . . . . . .   3
    4.  Operational Considerations  . . . . . . . . . . . . . . . . .   4
-     4.1.  Pros  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+     4.1.  Pros  . . . . . . . . . . . . . . . . . . . . . . . . . .   5
      4.2.  Cons  . . . . . . . . . . . . . . . . . . . . . . . . . .   5
    5.  Extensions to SUIT  . . . . . . . . . . . . . . . . . . . . .   6
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Moran & Tschofenig        Expires 14 March 2024                 [Page 2]
+Moran & Tschofenig        Expires 25 April 2024                 [Page 2]
 
-Internet-Draft              SUIT MUD Linkage              September 2023
+Internet-Draft              SUIT MUD Linkage                October 2023
 
 
    *  DHCP,
@@ -159,29 +159,32 @@ Internet-Draft              SUIT MUD Linkage              September 2023
 
 3.  Workflow
 
-   The intended workflow is as follows:
+   The intended workflow is as follows, and assumes an attestation
+   mechanism between the device and the MUD Manager:
 
 
 
 
-
-Moran & Tschofenig        Expires 14 March 2024                 [Page 3]
+Moran & Tschofenig        Expires 25 April 2024                 [Page 3]
 
-Internet-Draft              SUIT MUD Linkage              September 2023
+Internet-Draft              SUIT MUD Linkage                October 2023
 
 
    *  At the time of onboarding, devices report their manifest in use to
-      the MUD Manager via attestation evidence in the Entity Attestation
-      Token (EAT) [I-D.ietf-rats-eat].
+      the MUD Manager via some form of attestation evidence and a
+      conveyance protocol.  The normative specification of these
+      mechanisms is out of scope for this document.  .
 
-      -  Among other claims, the device will report its software
-         digest(s), and the manifest URI in the EAT "manifests" claim to
-         the MUD Manager.  This approach assumes that attestation
-         evidence includes a link to the SUIT manifest via the
-         "manifests" claim (see Section 4.2.15 of [I-D.ietf-rats-eat])
-         and that this evidence can be carried in either a network
-         access authentication protocol (for eample an EAP method) or
-         some onboarding protocol like FIDO Device Onboard (FDO).
+      -  An example of an attestation evidence format is the Entity
+         Attestation Token (EAT) [I-D.ietf-rats-eat].  Among other
+         claims, the device could report its software digest(s), and the
+         manifest URI in the EAT "manifests" claim to the MUD Manager.
+         This approach assumes that attestation evidence includes a link
+         to the SUIT manifest via the "manifests" claim (see
+         Section 4.2.15 of [I-D.ietf-rats-eat]) and that this evidence
+         can be carried in either a network access authentication
+         protocol (for eample an EAP method) or some onboarding protocol
+         like FIDO Device Onboard (FDO).
 
       -  The MUD Manager can then (with the help of the Verifier)
          validate the evidence in order to check that the device is
@@ -213,18 +216,20 @@ Internet-Draft              SUIT MUD Linkage              September 2023
 
 4.  Operational Considerations
 
+
+
+
+
+
+Moran & Tschofenig        Expires 25 April 2024                 [Page 4]
+
+Internet-Draft              SUIT MUD Linkage                October 2023
+
+
 4.1.  Pros
 
    The approach described in this document has several advantages over
    other MUD URL reporting mechanisms:
-
-
-
-
-Moran & Tschofenig        Expires 14 March 2024                 [Page 4]
-
-Internet-Draft              SUIT MUD Linkage              September 2023
-
 
    *  The MUD URL is tightly coupled to device software/firmware
       version.
@@ -272,14 +277,9 @@ Internet-Draft              SUIT MUD Linkage              September 2023
 
 
 
-
-
-
-
-
-Moran & Tschofenig        Expires 14 March 2024                 [Page 5]
+Moran & Tschofenig        Expires 25 April 2024                 [Page 5]
 
-Internet-Draft              SUIT MUD Linkage              September 2023
+Internet-Draft              SUIT MUD Linkage                October 2023
 
 
 5.  Extensions to SUIT
@@ -333,9 +333,9 @@ Internet-Draft              SUIT MUD Linkage              September 2023
 
 
 
-Moran & Tschofenig        Expires 14 March 2024                 [Page 6]
+Moran & Tschofenig        Expires 25 April 2024                 [Page 6]
 
-Internet-Draft              SUIT MUD Linkage              September 2023
+Internet-Draft              SUIT MUD Linkage                October 2023
 
 
    *  Label: TBD1 [[Value allocated from the standards action address
@@ -358,27 +358,28 @@ Internet-Draft              SUIT MUD Linkage              September 2023
 8.  Normative References
 
    [I-D.ietf-cose-key-thumbprint]
-              Isobe, K. and H. Tschofenig, "COSE Key Thumbprint", Work
-              in Progress, Internet-Draft, draft-ietf-cose-key-
-              thumbprint-01, 7 August 2023,
+              Isobe, K., Tschofenig, H., and O. Steele, "CBOR Object
+              Signing and Encryption (COSE) Key Thumbprint", Work in
+              Progress, Internet-Draft, draft-ietf-cose-key-thumbprint-
+              04, 23 October 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-cose-
-              key-thumbprint-01>.
+              key-thumbprint-04>.
 
    [I-D.ietf-rats-eat]
               Lundblade, L., Mandyam, G., O'Donoghue, J., and C.
               Wallace, "The Entity Attestation Token (EAT)", Work in
-              Progress, Internet-Draft, draft-ietf-rats-eat-21, 30 June
-              2023, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              rats-eat-21>.
+              Progress, Internet-Draft, draft-ietf-rats-eat-22, 14
+              October 2023, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-rats-eat-22>.
 
    [I-D.ietf-suit-manifest]
               Moran, B., Tschofenig, H., Birkholz, H., Zandberg, K., and
               O. Rønningstad, "A Concise Binary Object Representation
               (CBOR)-based Serialization Format for the Software Updates
               for Internet of Things (SUIT) Manifest", Work in Progress,
-              Internet-Draft, draft-ietf-suit-manifest-23, 10 September
+              Internet-Draft, draft-ietf-suit-manifest-24, 23 October
               2023, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              suit-manifest-23>.
+              suit-manifest-24>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -388,10 +389,9 @@ Internet-Draft              SUIT MUD Linkage              September 2023
 
 
 
-
-Moran & Tschofenig        Expires 14 March 2024                 [Page 7]
+Moran & Tschofenig        Expires 25 April 2024                 [Page 7]
 
-Internet-Draft              SUIT MUD Linkage              September 2023
+Internet-Draft              SUIT MUD Linkage                October 2023
 
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
@@ -445,4 +445,4 @@ Authors' Addresses
 
 
 
-Moran & Tschofenig        Expires 14 March 2024                 [Page 8]
+Moran & Tschofenig        Expires 25 April 2024                 [Page 8]
