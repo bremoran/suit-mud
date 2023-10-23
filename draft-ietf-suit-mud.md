@@ -101,12 +101,16 @@ capitals, as shown here.
 
 # Workflow
 
-The intended workflow is as follows:
+The intended workflow is as follows, and assumes an attestation mechanism between the device and the MUD Manager:
 
-* At the time of onboarding, devices report their manifest in use to the MUD Manager via attestation evidence in the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}. 
-    * Among other claims, the device will report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager. This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of {{I-D.ietf-rats-eat}}) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).
-    * The MUD Manager can then (with the help of the Verifier) validate the evidence in order to check that the device is operating with the expected version of software and configuration.
-    * Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.
+*  At the time of onboarding, devices report their manifest in use to the MUD Manager via some form of attestation evidence and a conveyance protocol.  The normative specification of these mechanisms is out of scope for this document. 
+.
+      -  An example of an attestation evidence format is the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}.  Among other claims, the device could report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager.  This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of {{I-D.ietf-rats-eat}}) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).
+
+      -  The MUD Manager can then (with the help of the Verifier) validate the evidence in order to check that the device is operating with the expected version of software and configuration.
+
+      -  Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.
+
 * If the SUIT_MUD_container, see {{suit-extension}}, has been severed, the MUD Manager can use the suit-reference-uri to retrieve the complete SUIT manifest.
 * The manifest authenticity is verified by the MUD Manager, which enforces that the MUD file presented is also authentic and as intended by the device software vendor.
 * The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest.
