@@ -56,8 +56,13 @@ This document defines a way to link a SUIT manifest to a MUD file offering a str
 
 # Introduction
 
-Under {{RFC8520}}, devices report a MUD URL to a MUD Manager in the network, which then interacts with a MUD File Server
-to ultimately obtain the MUD file. The following figure shows the MUD architecture.
+A Manufacturer Usage Description (MUD) file describes what sort of network communication behavior a device is designed to have. For example,
+a manufacturer may use a MUD file to describe that a device uses HTTP, DNS and NTP communication but no other protocols. The communication pattern are
+described in a JSON-based format in the MUD file.
+
+The MUD files do, however, need to be presented by the device to a MUD Manager in the operational network where the device is deployed.
+Under {{RFC8520}}, devices report a URL to the MUD file to a MUD Manager in the operational network, which then interacts with a MUD
+File Server to ultimately obtain the MUD file. {{arch-mud-fig}} shows the MUD architecture, as defined in RFC 8520.
 
 ~~~
     .......................................
@@ -75,22 +80,28 @@ to ultimately obtain the MUD file. The following figure shows the MUD architectu
     .                        |_________|  .
     .......................................
 ~~~
+{: #arch-mud-fig title="MUD Architecture per RFC 8520."}
 
-RFC 8520 envisions different approaches for conveying the MUD URL from the device to the network such as:
+RFC 8520 envisions different approaches for conveying the MUD URL from the device to the operational network such as:
 
 - DHCP,
-- IEEE802.1AB Link Layer Discovery Protocol (LLDP), and
+- IEEE 802.1AB Link Layer Discovery Protocol (LLDP), and
 - IEEE 802.1X whereby the URL to the MUD file would be contained in the certificate used in an EAP method.
 
-The MUD Manager uses the MUD URL to fetch the MUD file, which contains connectivity-related functionality required for a device to properly function.
+The MUD Manager must trust the MUD File Server from which the MUD file is fetched to return an authentic copy of the MUD file.
+It must also trust the device to report the correct MUD URL. In case of DHCP and LLDP the URL is likely unprotected and not bound
+to the device itself.
 
-The MUD Manager must trust the MUD File Server from which the MUD file is fetched to return an authentic copy of the MUD file. This concern may be mitigated using the optional signature reference in the MUD file. The MUD Manager must also trust the device to report a correct MUD URL. In case of DHCP and LLDP the URL is likely unprotected. 
+When the MUD URL is included in a certificate then it is authenticated and integrity protected. However, a certificate created
+for use with network access authentication is typically not signed by the entity that wrote the software and configured the device,
+which leads to a conflation of rights.
 
-When the MUD URL is included in a certificate then it is authenticated and integrity protected. A certificate created for use with network access authentication is typically not signed by the entity that wrote the software and configured the device, which leads to a conflation of rights.
+There is a need to bind the entity that creates the software and configuration to the MUD file. Only the developer can attest
+the communication requirements of the device.
 
-There is a need to bind the entity that creates the software/configuration to the MUD file because only that entity can attest the connectivity requirements of the device.
-
-This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest format {{I-D.ietf-suit-manifest}} to include a MUD URL. When combining a MUD URL with a manifest used for software/firmware updates then a network operator can get more confidence in the description of the connectivity requirements for a device to properly function.
+This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest format {{I-D.ietf-suit-manifest}}
+to include a MUD URL. When combining a MUD URL with a manifest used for software/firmware updates then a network operator can gain
+more confidence in the description of the communication requirements for a device to properly function.
 
 # Terminology
 
