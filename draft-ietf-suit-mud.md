@@ -1,7 +1,7 @@
 ---
 title: Strong Assertions of IoT Network Access Requirements
 abbrev: SUIT MUD Linkage
-docname: draft-ietf-suit-mud-06
+docname: draft-ietf-suit-mud-07
 category: std
 
 ipr: trust200902
@@ -42,6 +42,7 @@ normative:
   I-D.ietf-rats-eat:
   I-D.ietf-suit-manifest:
   I-D.ietf-cose-key-thumbprint:
+  RFC8610:
 
 --- abstract
 
@@ -104,7 +105,7 @@ capitals, as shown here.
 The intended workflow is as follows, and assumes an attestation mechanism between the device and the MUD Manager:
 
 *  At the time of onboarding, devices report their manifest in use to the MUD Manager via some form of attestation evidence and a conveyance protocol.  The normative specification of these mechanisms is out of scope for this document. 
-.
+
       -  An example of an attestation evidence format is the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}.  Among other claims, the device could report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager.  This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of {{I-D.ietf-rats-eat}}) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).
 
       -  The MUD Manager can then (with the help of the Verifier) validate the evidence in order to check that the device is operating with the expected version of software and configuration.
@@ -148,7 +149,7 @@ To enable strong assertions about the network access requirements that a device 
 The subject key identifier MUST be generated according to the process defined in {{I-D.ietf-cose-key-thumbprint}} and the SUIT_Digest structure MUST be populated with the selected hash algorithm and obtained fingerprint.
 The subject key identifier corresponds to the key used in the MUD signature file described in Section 13.2 of {{RFC8520}}.
 
-The following CDDL describes the extension to the SUIT_Manifest structure:
+The following Concise Data Definition Language (CDDL) {{RFC8610}} describes the extension to the SUIT_Manifest structure:
 
 ~~~CDDL
 $$severable-manifest-members-choice-extensions //= (
@@ -191,4 +192,9 @@ IANA is requested to add a new value to the SUIT envelope elements registry crea
 - Name: Manufacturer Usage Description (MUD)
 - Reference: [[TBD: This document]]
 
+--- back
 
+# Acknowledgements
+{: numbered="no"}
+
+We would like to thank Roman Danyliw for his excellent review as the responsible security area director, Bahcet Sarikaya for his Genart review, and Susan hares for her Opsdir review.
