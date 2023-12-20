@@ -1,7 +1,7 @@
 ---
 title: Strong Assertions of IoT Network Access Requirements
 abbrev: SUIT MUD Linkage
-docname: draft-ietf-suit-mud-06
+docname: draft-ietf-suit-mud-07
 category: std
 
 ipr: trust200902
@@ -42,6 +42,17 @@ normative:
   I-D.ietf-rats-eat:
   I-D.ietf-suit-manifest:
   I-D.ietf-cose-key-thumbprint:
+  RFC8610:
+  RFC9334:
+informative:
+  RFC9190:
+  I-D.fossati-tls-attestation:
+  FDO:
+    author:
+      org: FIDO Alliance
+    title: FIDO Device Onboard Specification 1.1
+    date: April 2022
+    target: https://fidoalliance.org/specifications/download-iot-specifications/
 
 --- abstract
 
@@ -55,8 +66,13 @@ This document defines a way to link a SUIT manifest to a MUD file offering a str
 
 # Introduction
 
-Under {{RFC8520}}, devices report a MUD URL to a MUD Manager in the network, which then interacts with a MUD File Server
-to ultimately obtain the MUD file. The following figure shows the MUD architecture.
+A Manufacturer Usage Description (MUD) file describes what sort of network communication behavior a device is designed to have. For example,
+a manufacturer may use a MUD file to describe that a device uses HTTP, DNS and NTP communication but no other protocols. The communication pattern are
+described in a JSON-based format in the MUD file.
+
+The MUD files do, however, need to be presented by the device to a MUD Manager in the operational network where the device is deployed.
+Under {{RFC8520}}, devices report a URL to the MUD file to a MUD Manager in the operational network, which then interacts with a MUD
+File Server to ultimately obtain the MUD file. {{arch-mud-fig}} shows the MUD architecture, as defined in RFC 8520.
 
 ~~~
     .......................................
@@ -74,22 +90,28 @@ to ultimately obtain the MUD file. The following figure shows the MUD architectu
     .                        |_________|  .
     .......................................
 ~~~
+{: #arch-mud-fig title="MUD Architecture per RFC 8520."}
 
-RFC 8520 envisions different approaches for conveying the MUD URL from the device to the network such as:
+RFC 8520 envisions different approaches for conveying the MUD URL from the device to the operational network such as:
 
 - DHCP,
-- IEEE802.1AB Link Layer Discovery Protocol (LLDP), and
+- IEEE 802.1AB Link Layer Discovery Protocol (LLDP), and
 - IEEE 802.1X whereby the URL to the MUD file would be contained in the certificate used in an EAP method.
 
-The MUD Manager uses the MUD URL to fetch the MUD file, which contains connectivity-related functionality required for a device to properly function.
+The MUD Manager must trust the MUD File Server from which the MUD file is fetched to return an authentic copy of the MUD file.
+It must also trust the device to report the correct MUD URL. In case of DHCP and LLDP the URL is likely unprotected and not bound
+to the device itself.
 
-The MUD Manager must trust the MUD File Server from which the MUD file is fetched to return an authentic copy of the MUD file. This concern may be mitigated using the optional signature reference in the MUD file. The MUD Manager must also trust the device to report a correct MUD URL. In case of DHCP and LLDP the URL is likely unprotected. 
+When the MUD URL is included in a certificate then it is authenticated and integrity protected. However, a certificate created
+for use with network access authentication is typically not signed by the entity that wrote the software and configured the device,
+which leads to a conflation of rights.
 
-When the MUD URL is included in a certificate then it is authenticated and integrity protected. A certificate created for use with network access authentication is typically not signed by the entity that wrote the software and configured the device, which leads to a conflation of rights.
+There is a need to bind the entity that creates the software and configuration to the MUD file. Only the developer can attest
+the communication requirements of the device.
 
-There is a need to bind the entity that creates the software/configuration to the MUD file because only that entity can attest the connectivity requirements of the device.
-
-This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest format {{I-D.ietf-suit-manifest}} to include a MUD URL. When combining a MUD URL with a manifest used for software/firmware updates then a network operator can get more confidence in the description of the connectivity requirements for a device to properly function.
+This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest format {{I-D.ietf-suit-manifest}}
+to include a MUD URL. When combining a MUD URL with a manifest used for software/firmware updates then a network operator can gain
+more confidence in the description of the communication requirements for a device to properly function.
 
 # Terminology
 
@@ -99,15 +121,60 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
 capitals, as shown here.
 
+Attestation-related terminology is defined in {{RFC9334}}.
+
 # Workflow
+
+{{arch-mud-new-fig}} shows the architectural extensions introduced by combining
+SUIT and MUD. The key elements are that the developer, who produces the
+firmware is also generating a manifest and the MUD file. Information
+about the MUD file is embedded into the SUIT manifest and provided to the
+device via firmware update mechanism. Once this information is available
+on the device it can be presented during device onboarding, during
+network access authentication, or as part of other interactions that
+involve the conveyance of Evidence to the operational network. After
+retrieving the manifest, the MUD file can be obtained as well.
+
+~~~
+                        ____________
+                       |            |
+                       |  Manifest  |
+                       | Repository |
+                       |____________|
+                  get URL ^      | SUIT manifest
+ .........................|......|..........
+ .                      __|______v__       .       _____________
+ .                     |            |      .      |             |
+ .                     |    MUD     |-->get URL-->|    MUD      |
+ .                     |  Manager   |  .(https)   | File Server |
+ .  End system network |____________|<-MUD file<-<|             |
+ .                             ^       +Signature |_____________|
+ .                             .           .
+ .                             .           .
+ .                             .           .
+ . ________                _____________   .
+ .|        | Attestation  | NAS, AAA or |  .
+ .| Device |-->Evidence-->| Onboarding  |  .
+ .|________| (+ Manifest  | Serverdig   |  .
+ .     ^      Claim)      |_____________|  .
+ ......*....................................
+       *                                         //-\\
+       *                                          \-/
+       *                        SUIT Manifest      |
+       +************************(+ MUD URL)    ----*-----
+                                Firmware          / \
+                                                  /  \
+                                               Developer
+~~~
+{: #arch-mud-new-fig title="SUIT-MUD Architecture."}
 
 The intended workflow is as follows, and assumes an attestation mechanism between the device and the MUD Manager:
 
-*  At the time of onboarding, devices report their manifest in use to the MUD Manager via some form of attestation evidence and a conveyance protocol.  The normative specification of these mechanisms is out of scope for this document. 
-.
-      -  An example of an attestation evidence format is the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}.  Among other claims, the device could report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager.  This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of {{I-D.ietf-rats-eat}}) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).
+*  At the time of onboarding, devices report their manifest in use to the MUD Manager via some form of attestation Evidence and a conveyance protocol.  The normative specification of these mechanisms is out of scope for this document. 
 
-      -  The MUD Manager can then (with the help of the Verifier) validate the evidence in order to check that the device is operating with the expected version of software and configuration.
+      -  An example of an Evidence format is the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}, which offers a rich set of claims. This specification assumes that Evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of {{I-D.ietf-rats-eat}}) or that the manifest itself is embedded in the Evidence. This Evidence is conveyed to the operational network via some protocol, such as network access authentication protocol (for example using the EAP-TLS 1.3 method {{RFC9190}} utilizing the attestation extensions {{I-D.fossati-tls-attestation}}) or an onboarding protocol like FIDO Device Onboard (FDO) {{FDO}}.
+
+      -  The MUD Manager can then (with the help of the Verifier) validate the Evidence in order to check that the device is operating with the expected version of software and configuration.
 
       -  Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.
 
@@ -140,7 +207,7 @@ The approach described in this document has several advantages over other MUD UR
 
 ## Cons
 
-This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself. The SUIT manifest must then be conveyed to the network during onboarding or during the network access authentication step. To accomplish the transport of the manifest attestation evidence is used, which needs to be available at the protocol of choice. 
+This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself. The SUIT manifest must then be conveyed to the network during onboarding or during the network access authentication step. To accomplish the transport of the manifest Evidence is used, which needs to be available at the protocol of choice. 
 
 # Extensions to SUIT {#suit-extension}
 
@@ -148,7 +215,7 @@ To enable strong assertions about the network access requirements that a device 
 The subject key identifier MUST be generated according to the process defined in {{I-D.ietf-cose-key-thumbprint}} and the SUIT_Digest structure MUST be populated with the selected hash algorithm and obtained fingerprint.
 The subject key identifier corresponds to the key used in the MUD signature file described in Section 13.2 of {{RFC8520}}.
 
-The following CDDL describes the extension to the SUIT_Manifest structure:
+The following Concise Data Definition Language (CDDL) {{RFC8610}} describes the extension to the SUIT_Manifest structure:
 
 ~~~CDDL
 $$severable-manifest-members-choice-extensions //= (
@@ -191,4 +258,9 @@ IANA is requested to add a new value to the SUIT envelope elements registry crea
 - Name: Manufacturer Usage Description (MUD)
 - Reference: [[TBD: This document]]
 
+--- back
 
+# Acknowledgements
+{: numbered="no"}
+
+We would like to thank Roman Danyliw for his excellent review as the responsible security area director, Bahcet Sarikaya for his Genart review, and Susan Hares for her Opsdir review.
