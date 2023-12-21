@@ -220,16 +220,8 @@ The extensions to the SUIT manifest are described using the Concise Data Definit
 The extension to the SUIT_Manifest is described here:
 
 ~~~CDDL
-$$severable-manifest-members-choice-extensions //= (
+$$unseverable-manifest-member-extensions //= (
   suit-manifest-mud => SUIT_Digest / bstr .cbor SUIT_MUD_container
-)
-~~~
-
-The extension to the SUIT_Envelope is described here:
-
-~~~CDDL
-$$SUIT_severable-members-extensions //= (
-  suit-manifest-mud => bstr .cbor SUIT_MUD_container
 )
 ~~~
 
@@ -251,12 +243,6 @@ This specification links MUD files to SUIT manifests for improving security prot
 IANA is requested to add a new value to the SUIT manifest elements registry created with {{I-D.ietf-suit-manifest}}:
 
 - Label: TBD1 [[Value allocated from the standards action address range]]
-- Name: Manufacturer Usage Description (MUD)
-- Reference: [[TBD: This document]]
-
-IANA is requested to add a new value to the SUIT envelope elements registry created with {{I-D.ietf-suit-manifest}}:
-
-- Label: TBD2 [[Value allocated from the standards action address range]]
 - Name: Manufacturer Usage Description (MUD)
 - Reference: [[TBD: This document]]
 
