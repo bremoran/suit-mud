@@ -221,7 +221,7 @@ The extension to the SUIT_Manifest is described here:
 
 ~~~CDDL
 $$unseverable-manifest-member-extensions //= (
-  suit-manifest-mud => SUIT_Digest / bstr .cbor SUIT_MUD_container
+  suit-manifest-mud => bstr .cbor SUIT_MUD_container
 )
 ~~~
 
