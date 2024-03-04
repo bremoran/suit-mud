@@ -1,8 +1,8 @@
 ---
 title: Strong Assertions of IoT Network Access Requirements
 abbrev: SUIT MUD Linkage
-docname: draft-ietf-suit-mud-07
 updates: draft-ietf-suit-manifest
+docname: draft-ietf-suit-mud-08
 category: std
 
 ipr: trust200902
@@ -229,16 +229,10 @@ Note: A key need not be in COSE Key format to create a COSE Key Thumbprint of it
 
 The following Concise Data Definition Language (CDDL) {{RFC8610}} describes the extension to the SUIT_Manifest structure:
 
-~~~CDDL
-$$severable-manifest-members-choice-extensions //= (
-  suit-manifest-mud => SUIT_Digest / SUIT_MUD_container
-)
-~~~
-
-The SUIT_Envelope is also amended:
+The extension to the SUIT_Manifest is described here:
 
 ~~~CDDL
-$$SUIT_severable-members-extensions //= (
+$$unseverable-manifest-member-extensions //= (
   suit-manifest-mud => bstr .cbor SUIT_MUD_container
 )
 ~~~
@@ -270,12 +264,6 @@ is already deployed and in use.
 IANA is requested to add a new value to the SUIT manifest elements registry created with {{I-D.ietf-suit-manifest}}:
 
 - Label: TBD1 [[Value allocated from the standards action address range]]
-- Name: Manufacturer Usage Description (MUD)
-- Reference: [[TBD: This document]]
-
-IANA is requested to add a new value to the SUIT envelope elements registry created with {{I-D.ietf-suit-manifest}}:
-
-- Label: TBD2 [[Value allocated from the standards action address range]]
 - Name: Manufacturer Usage Description (MUD)
 - Reference: [[TBD: This document]]
 
