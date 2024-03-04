@@ -19,7 +19,7 @@
 <?rfc text-list-symbols="-o*+"?>
 <?rfc docmapping="yes"?>
 
-<rfc ipr="trust200902" docName="draft-ietf-suit-mud-06" category="std" consensus="true" tocInclude="true" sortRefs="true" symRefs="true">
+<rfc ipr="trust200902" docName="draft-ietf-suit-mud-08" category="std" consensus="true" updates="draft-ietf-suit-manifest" tocInclude="true" sortRefs="true" symRefs="true">
   <front>
     <title abbrev="SUIT MUD Linkage">Strong Assertions of IoT Network Access Requirements</title>
 
@@ -36,7 +36,7 @@
       </address>
     </author>
 
-    <date year="2023" month="October" day="23"/>
+    <date year="2024" month="March" day="04"/>
 
     <area>Security</area>
     <workgroup>SUIT</workgroup>
@@ -45,11 +45,11 @@
     <abstract>
 
 
-<t>The Manufacturer Usage Description (MUD) specification describes the access and network functionality required for a device to properly function. The MUD description has to reflect the software running on the device and its configuration. Because of this, the most appropriate entity for describing device network access requirements is the same as the entity developing the software and its configuration.</t>
+<t>The Manufacturer Usage Description (MUD) specification describes the access and network functionality required for a device to properly function. This description has to reflect the software running on the device and its configuration. Because of this, the most appropriate entity for describing device network access requirements is the same as the entity developing the software and its configuration.</t>
 
 <t>A network presented with a MUD file by a device allows detection of misbehavior by the device software and configuration of access control.</t>
 
-<t>This document defines a way to link a SUIT manifest to a MUD file offering a stronger binding between the two.</t>
+<t>This document defines a way to link the Software Updates for Internet of Things (SUIT) manifest to a MUD file offering a stronger binding between the two.</t>
 
 
 
@@ -64,10 +64,16 @@
 
 <section anchor="introduction"><name>Introduction</name>
 
-<t>Under <xref target="RFC8520"/>, devices report a MUD URL to a MUD Manager in the network, which then interacts with a MUD File Server
-to ultimately obtain the MUD file. The following figure shows the MUD architecture.</t>
+<t>A Manufacturer Usage Description (MUD) file describes what sort of network communication behavior a device is designed to have. For example,
+a manufacturer may use a MUD file to describe that a device uses HTTP, DNS and NTP communication but no other protocols. The communication patterns are
+described in a JSON-based format in the MUD file.</t>
 
-<figure><artwork><![CDATA[
+<t>The MUD files do, however, need to be presented by the device to a MUD manager in the operational network where the device is deployed.
+Under <xref target="RFC8520"/>, devices report a MUD URL to a MUD manager in the operational network. The MUD URL is a URL that can be used by the MUD manager to receive the MUD file from a MUD file server to ultimately obtain the MUD file.</t>
+
+<t><xref target="arch-mud-fig"/> shows the MUD architecture, as defined in RFC 8520.</t>
+
+<figure title="MUD Architecture per RFC 8520." anchor="arch-mud-fig"><artwork><![CDATA[
     .......................................
     .                      ____________   .           _____________
     .                     |            |  .          |             |
@@ -84,23 +90,29 @@ to ultimately obtain the MUD file. The following figure shows the MUD architectu
     .......................................
 ]]></artwork></figure>
 
-<t>RFC 8520 envisions different approaches for conveying the MUD URL from the device to the network such as:</t>
+<t>RFC 8520 envisions different approaches for conveying the MUD URL from the device to the operational network. Section 4 of <xref target="I-D.ietf-opsawg-mud-acceptable-urls"/> provides additional description of the MUD URLs sources, which include:</t>
 
 <t><list style="symbols">
   <t>DHCP,</t>
-  <t>IEEE802.1AB Link Layer Discovery Protocol (LLDP), and</t>
+  <t>IEEE 802.1AB Link Layer Discovery Protocol (LLDP), and</t>
   <t>IEEE 802.1X whereby the URL to the MUD file would be contained in the certificate used in an EAP method.</t>
 </list></t>
 
-<t>The MUD Manager uses the MUD URL to fetch the MUD file, which contains connectivity-related functionality required for a device to properly function.</t>
+<t>The MUD manager must trust the MUD file server from which the MUD file is fetched to return the most up-to-date MUD file.
+It must also trust the device to report the correct MUD URL. In case of DHCP and LLDP the URL is unprotected and not bound
+to the device itself.</t>
 
-<t>The MUD Manager must trust the MUD File Server from which the MUD file is fetched to return an authentic copy of the MUD file. This concern may be mitigated using the optional signature reference in the MUD file. The MUD Manager must also trust the device to report a correct MUD URL. In case of DHCP and LLDP the URL is likely unprotected.</t>
+<t>When the MUD URL is included in a certificate then it is authenticated and integrity protected. There is a need to bind the entity that creates the software and configuration to the MUD file. The developer is in the best position to describe
+the communication requirements of the software it developed and configured for a device.</t>
 
-<t>When the MUD URL is included in a certificate then it is authenticated and integrity protected. A certificate created for use with network access authentication is typically not signed by the entity that wrote the software and configured the device, which leads to a conflation of rights.</t>
+<t>This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest <xref target="I-D.ietf-suit-manifest"/>
+to include a MUD URL. A SUIT manifest is
+   a bundle of metadata about code/data for an IoT device, where to find the code/data, the
+   devices to which it applies, and cryptographic information protecting
+   the manifest.</t>
 
-<t>There is a need to bind the entity that creates the software/configuration to the MUD file because only that entity can attest the connectivity requirements of the device.</t>
-
-<t>This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest format <xref target="I-D.ietf-suit-manifest"/> to include a MUD URL. When combining a MUD URL with a manifest used for software/firmware updates then a network operator can get more confidence in the description of the connectivity requirements for a device to properly function.</t>
+<t>When combining a MUD URL with a manifest used for software/firmware updates then a network operator can gain
+more confidence in the description of the communication requirements for a device to properly function.</t>
 
 </section>
 <section anchor="terminology"><name>Terminology</name>
@@ -111,22 +123,67 @@ to ultimately obtain the MUD file. The following figure shows the MUD architectu
 BCP 14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only when, they appear in all
 capitals, as shown here.</t>
 
+<t>This document re-uses the terms defined in <xref target="RFC9334"/> related to
+remote attestation.  Readers of this document are assumed to be
+familiar with the following terms: Evidence, Claim, Attester, Verifier,
+and Relying Party (RP).</t>
+
+<t>This document also uses terms defined in <xref target="RFC8520"/>, such as MUD,
+MUD file, MUD manager, MUD URL, etc.</t>
+
 </section>
 <section anchor="workflow"><name>Workflow</name>
+
+<t><xref target="arch-mud-new-fig"/> shows the architectural extensions introduced by combining
+SUIT and MUD. The key elements are that the developer, who produces the
+firmware is also generating a manifest and the MUD file. Information
+about the MUD file is embedded into the SUIT manifest and provided to the
+device via firmware update mechanism. Once this information is available
+on the device it can be presented during device onboarding, during
+network access authentication, or as part of other interactions that
+involve the conveyance of Evidence to the operational network. After
+retrieving the manifest, the MUD file can be obtained as well.</t>
+
+<figure title="SUIT-MUD Architecture." anchor="arch-mud-new-fig"><artwork><![CDATA[
+                        ____________
+                       |            |
+                       |  Manifest  |
+                       | Repository |
+                       |____________|
+                  get URL ^      | SUIT manifest
+ .........................|......|..........
+ .                      __|______v__       .       _____________
+ .                     |            |      .      |             |
+ .                     |    MUD     |-->get URL-->|    MUD      |
+ .                     |  Manager   |  .(https)   | File Server |
+ .  End system network |____________|<-MUD file<-<|             |
+ .                             ^       +Signature |_____________|
+ .                             .           .
+ .                             .           .
+ .                             .           .
+ . ________                _____________   .
+ .|        | Attestation  | NAS, AAA or |  .
+ .| Device |-->Evidence-->| Onboarding  |  .
+ .|________| (+ Manifest  | Server      |  .
+ .     ^      Claim)      |_____________|  .
+ ......*....................................
+       *                                         //-\\
+       *                                          \-/
+       *                        SUIT Manifest      |
+       +************************(+ MUD URL)    ----*-----
+                                Firmware          / \
+                                                  /  \
+                                               Developer
+]]></artwork></figure>
 
 <t>The intended workflow is as follows, and assumes an attestation mechanism between the device and the MUD Manager:</t>
 
 <t><list style="symbols">
-  <t>At the time of onboarding, devices report their manifest in use to the MUD Manager via some form of attestation evidence and a conveyance protocol.  The normative specification of these mechanisms is out of scope for this document. 
-.
-  <list style="symbols">
-      <t>An example of an attestation evidence format is the Entity Attestation Token (EAT) <xref target="I-D.ietf-rats-eat"/>.  Among other claims, the device could report its software digest(s), and the manifest URI in the EAT "manifests" claim to the MUD Manager.  This approach assumes that attestation evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of <xref target="I-D.ietf-rats-eat"/>) and that this evidence can be carried in either a network access authentication protocol (for eample an EAP method) or some onboarding protocol like FIDO Device Onboard (FDO).</t>
-      <t>The MUD Manager can then (with the help of the Verifier) validate the evidence in order to check that the device is operating with the expected version of software and configuration.</t>
-      <t>Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.</t>
-    </list></t>
-  <t>If the SUIT_MUD_container, see <xref target="suit-extension"/>, has been severed, the MUD Manager can use the suit-reference-uri to retrieve the complete SUIT manifest.</t>
-  <t>The manifest authenticity is verified by the MUD Manager, which enforces that the MUD file presented is also authentic and as intended by the device software vendor.</t>
-  <t>The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest.</t>
+  <t>At the time of onboarding, devices report their manifest in use to the MUD Manager via some form of attestation Evidence and a conveyance protocol. The device thereby acts as an Attester. The normative specification of these mechanisms is out of scope for this document.</t>
+  <t>An example of an Evidence format is the Entity Attestation Token (EAT) <xref target="I-D.ietf-rats-eat"/>, which offers a rich set of claims. This specification assumes that Evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of <xref target="I-D.ietf-rats-eat"/>) or that the manifest itself is embedded in the Evidence. This Evidence is conveyed to the operational network via some protocol, such as network access authentication protocol (for example using the EAP-TLS 1.3 method <xref target="RFC9190"/> utilizing the attestation extensions <xref target="I-D.fossati-tls-attestation"/>) or an onboarding protocol like FIDO Device Onboard (FDO) <xref target="FDO"/> or Bootstrapping Remote Secure Key Infrastructure (BRSKI) <xref target="RFC8995"/>.</t>
+  <t>The MUD Manager, acting as a Relying Party, relays the Evidence to the Verifier and receives an Attestation Result in response. This allows the MUD Manager to check that the device is operating with the expected version of software and configuration.</t>
+  <t>Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.</t>
+  <t>The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest. The SUIT manifest contains the MUD URL and not the MUD file primarily to due the size of the MUD file. This also allows the MUD file to be updated rapidly in response to evolving threats.</t>
   <t>The MUD Manager verifies the MUD file signature using the Subject Key Identifier (SKI) provided in the SUIT manifest.</t>
   <t>Then, the MUD Manager can apply any appropriate policy as described by the MUD file.</t>
 </list></t>
@@ -136,49 +193,46 @@ capitals, as shown here.</t>
 </section>
 <section anchor="operational-considerations"><name>Operational Considerations</name>
 
+<t>This specification assumes that the software/firmware author provides a MUD file that describes the behavior of the software running on a device.</t>
+
 <section anchor="pros"><name>Pros</name>
 
-<t>The approach described in this document has several advantages over other MUD URL reporting mechanisms:</t>
+<t>The approach described in this document has several advantages over the RFC 8520 MUD URL reporting mechanisms:</t>
 
 <t><list style="symbols">
   <t>The MUD URL is tightly coupled to device software/firmware version.</t>
   <t>The device does not report the MUD URL, so the device cannot tamper with the MUD URL.</t>
-  <t>The onus is placed on the software/firmware author to provide a MUD file that describes the behavior of the software running on a device.</t>
   <t>The author explicitly authorizes a key to sign MUD files, providing a tight coupling between the party that knows device behavior best (the author of the software/firmware) and the party that declares device behavior (MUD file signer).</t>
   <t>Network operators do not need to know, a priori, which MUD URL to use for each device; this can be harvested from the device's manifest and only replaced if necessary.</t>
   <t>A network operator can still replace a MUD URL in a SUIT manifest:  <list style="symbols">
       <t>By providing a SUIT manifest that overrides the MUD URL.</t>
       <t>By replacing the MUD URL in their network infrastructure.</t>
     </list></t>
-  <t>Devices can be quarantined if they do not attest a known software/firmware version.</t>
+  <t>Devices can be quarantined if the Attestation Result indicates that an out-dated or compromised software/firmware version has been used.</t>
   <t>Devices cannot lie about which MUD URL to use.</t>
 </list></t>
 
 </section>
 <section anchor="cons"><name>Cons</name>
 
-<t>This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself. The SUIT manifest must then be conveyed to the network during onboarding or during the network access authentication step. To accomplish the transport of the manifest attestation evidence is used, which needs to be available at the protocol of choice.</t>
+<t>This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself. The SUIT manifest must then be conveyed to the network during onboarding or during the network access authentication step. Attestation Evidence is used to convey the SUIT manifest.</t>
 
 </section>
 </section>
 <section anchor="suit-extension"><name>Extensions to SUIT</name>
 
-<t>To enable strong assertions about the network access requirements that a device should have for a particular software/configuration pair a MUD URL is added to the SUIT manifest along with a subject key identifier (ski).
+<t>To enable strong assertions about the network access requirements that a device should have for a particular software/configuration pair a MUD URL is added to the SUIT manifest along with a subject key identifier (ski). Note that the subject key identifier refers to a more generic version of SubjectPublicKeyInfo defined in <xref target="RFC5280"/>, which refers to an X.509-based ski.
 The subject key identifier MUST be generated according to the process defined in <xref target="I-D.ietf-cose-key-thumbprint"/> and the SUIT_Digest structure MUST be populated with the selected hash algorithm and obtained fingerprint.
 The subject key identifier corresponds to the key used in the MUD signature file described in Section 13.2 of <xref target="RFC8520"/>.</t>
 
-<t>The following CDDL describes the extension to the SUIT_Manifest structure:</t>
+<t>Note: A key need not be in COSE Key format to create a COSE Key Thumbprint of it.</t>
+
+<t>The following Concise Data Definition Language (CDDL) <xref target="RFC8610"/> describes the extension to the SUIT_Manifest structure:</t>
+
+<t>The extension to the SUIT_Manifest is described here:</t>
 
 <figure><sourcecode type="CDDL"><![CDATA[
-$$severable-manifest-members-choice-extensions //= (
-  suit-manifest-mud => SUIT_Digest / SUIT_MUD_container
-)
-]]></sourcecode></figure>
-
-<t>The SUIT_Envelope is also amended:</t>
-
-<figure><sourcecode type="CDDL"><![CDATA[
-$$SUIT_severable-members-extensions //= (
+$$unseverable-manifest-member-extensions //= (
   suit-manifest-mud => bstr .cbor SUIT_MUD_container
 )
 ]]></sourcecode></figure>
@@ -195,7 +249,17 @@ SUIT_MUD_container = {
 </section>
 <section anchor="security-considerations"><name>Security Considerations</name>
 
-<t>This specification links MUD files to SUIT manifests for improving security protection and ease of use. By including MUD URLs in SUIT manifests an extra layer of protection has been created and synchronization risks can be minimized. If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning.</t>
+<t>This specification links MUD files to SUIT manifests for improving security protection and ease of use. By including MUD URLs in SUIT manifests an extra layer of protection has been created and synchronization risks can be minimized.</t>
+
+<t>If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning. This is, however,
+not a concern specific to this specification but rather to the use of MUD in general. Below are two mitigations:</t>
+
+<t><list style="symbols">
+  <t>A manufacturer must update the MUD file in advance of network service or product changes so 
+that the new services can be supported. Because the MUD file is accessed by a URL means that it can be subsequently updated. This requires a MUD file being retrieved again. This handles the case when the device 
+is already deployed and in use.</t>
+  <t>There is a possibility that an IoT device has remained on-shelf inventory for an extended period, resulting in its MUD file being inaccessible at its previous location. This necessitates a decision on how to implement a fail-safe tailored to the particular environment.</t>
+</list></t>
 
 </section>
 <section anchor="iana-considerations"><name>IANA Considerations</name>
@@ -204,14 +268,6 @@ SUIT_MUD_container = {
 
 <t><list style="symbols">
   <t>Label: TBD1 [[Value allocated from the standards action address range]]</t>
-  <t>Name: Manufacturer Usage Description (MUD)</t>
-  <t>Reference: [[TBD: This document]]</t>
-</list></t>
-
-<t>IANA is requested to add a new value to the SUIT envelope elements registry created with <xref target="I-D.ietf-suit-manifest"/>:</t>
-
-<t><list style="symbols">
-  <t>Label: TBD2 [[Value allocated from the standards action address range]]</t>
   <t>Name: Manufacturer Usage Description (MUD)</t>
   <t>Reference: [[TBD: This document]]</t>
 </list></t>
@@ -280,15 +336,14 @@ SUIT_MUD_container = {
          <organization>Security Theory LLC</organization>
       </author>
       <author fullname='Giridhar Mandyam' initials='G.' surname='Mandyam'>
-         <organization>Qualcomm Technologies Inc.</organization>
-      </author>
+         </author>
       <author fullname='Jeremy O&#x27;Donoghue' initials='J.' surname='O&#x27;Donoghue'>
          <organization>Qualcomm Technologies Inc.</organization>
       </author>
       <author fullname='Carl Wallace' initials='C.' surname='Wallace'>
          <organization>Red Hound Software, Inc.</organization>
       </author>
-      <date day='14' month='October' year='2023'/>
+      <date day='15' month='January' year='2024'/>
       <abstract>
 	 <t>   An Entity Attestation Token (EAT) provides an attested claims set
    that describes state and characteristics of an entity, a device like
@@ -302,7 +357,7 @@ SUIT_MUD_container = {
 	 </t>
       </abstract>
    </front>
-   <seriesInfo name='Internet-Draft' value='draft-ietf-rats-eat-22'/>
+   <seriesInfo name='Internet-Draft' value='draft-ietf-rats-eat-25'/>
    
 </reference>
 
@@ -324,7 +379,7 @@ SUIT_MUD_container = {
       <author fullname='Øyvind Rønningstad' initials='O.' surname='Rønningstad'>
          <organization>Nordic Semiconductor</organization>
       </author>
-      <date day='23' month='October' year='2023'/>
+      <date day='5' month='February' year='2024'/>
       <abstract>
 	 <t>   This specification describes the format of a manifest.  A manifest is
    a bundle of metadata about code/data obtained by a recipient (chiefly
@@ -337,7 +392,7 @@ SUIT_MUD_container = {
 	 </t>
       </abstract>
    </front>
-   <seriesInfo name='Internet-Draft' value='draft-ietf-suit-manifest-24'/>
+   <seriesInfo name='Internet-Draft' value='draft-ietf-suit-manifest-25'/>
    
 </reference>
 
@@ -369,103 +424,322 @@ SUIT_MUD_container = {
    
 </reference>
 
+<reference anchor='RFC8610'>
+  <front>
+    <title>Concise Data Definition Language (CDDL): A Notational Convention to Express Concise Binary Object Representation (CBOR) and JSON Data Structures</title>
+    <author fullname='H. Birkholz' initials='H.' surname='Birkholz'/>
+    <author fullname='C. Vigano' initials='C.' surname='Vigano'/>
+    <author fullname='C. Bormann' initials='C.' surname='Bormann'/>
+    <date month='June' year='2019'/>
+    <abstract>
+      <t>This document proposes a notational convention to express Concise Binary Object Representation (CBOR) data structures (RFC 7049). Its main goal is to provide an easy and unambiguous way to express structures for protocol messages and data formats that use CBOR or JSON.</t>
+    </abstract>
+  </front>
+  <seriesInfo name='RFC' value='8610'/>
+  <seriesInfo name='DOI' value='10.17487/RFC8610'/>
+</reference>
+
+<reference anchor='RFC9334'>
+  <front>
+    <title>Remote ATtestation procedureS (RATS) Architecture</title>
+    <author fullname='H. Birkholz' initials='H.' surname='Birkholz'/>
+    <author fullname='D. Thaler' initials='D.' surname='Thaler'/>
+    <author fullname='M. Richardson' initials='M.' surname='Richardson'/>
+    <author fullname='N. Smith' initials='N.' surname='Smith'/>
+    <author fullname='W. Pan' initials='W.' surname='Pan'/>
+    <date month='January' year='2023'/>
+    <abstract>
+      <t>In network protocol exchanges, it is often useful for one end of a communication to know whether the other end is in an intended operating state. This document provides an architectural overview of the entities involved that make such tests possible through the process of generating, conveying, and evaluating evidentiary Claims. It provides a model that is neutral toward processor architectures, the content of Claims, and protocols.</t>
+    </abstract>
+  </front>
+  <seriesInfo name='RFC' value='9334'/>
+  <seriesInfo name='DOI' value='10.17487/RFC9334'/>
+</reference>
+
+
+
+
+    </references>
+
+    <references title='Informative References'>
+
+
+
+<reference anchor='RFC9190'>
+  <front>
+    <title>EAP-TLS 1.3: Using the Extensible Authentication Protocol with TLS 1.3</title>
+    <author fullname='J. Preuß Mattsson' initials='J.' surname='Preuß Mattsson'/>
+    <author fullname='M. Sethi' initials='M.' surname='Sethi'/>
+    <date month='February' year='2022'/>
+    <abstract>
+      <t>The Extensible Authentication Protocol (EAP), defined in RFC 3748, provides a standard mechanism for support of multiple authentication methods. This document specifies the use of EAP-TLS with TLS 1.3 while remaining backwards compatible with existing implementations of EAP-TLS. TLS 1.3 provides significantly improved security and privacy, and reduced latency when compared to earlier versions of TLS. EAP-TLS with TLS 1.3 (EAP-TLS 1.3) further improves security and privacy by always providing forward secrecy, never disclosing the peer identity, and by mandating use of revocation checking when compared to EAP-TLS with earlier versions of TLS. This document also provides guidance on authentication, authorization, and resumption for EAP-TLS in general (regardless of the underlying TLS version used). This document updates RFC 5216.</t>
+    </abstract>
+  </front>
+  <seriesInfo name='RFC' value='9190'/>
+  <seriesInfo name='DOI' value='10.17487/RFC9190'/>
+</reference>
+
+
+<reference anchor='I-D.fossati-tls-attestation'>
+   <front>
+      <title>Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)</title>
+      <author fullname='Hannes Tschofenig' initials='H.' surname='Tschofenig'>
+         </author>
+      <author fullname='Yaron Sheffer' initials='Y.' surname='Sheffer'>
+         <organization>Intuit</organization>
+      </author>
+      <author fullname='Paul Howard' initials='P.' surname='Howard'>
+         <organization>Arm Limited</organization>
+      </author>
+      <author fullname='Ionuț Mihalcea' initials='I.' surname='Mihalcea'>
+         <organization>Arm Limited</organization>
+      </author>
+      <author fullname='Yogesh Deshpande' initials='Y.' surname='Deshpande'>
+         <organization>Arm Limited</organization>
+      </author>
+      <author fullname='Arto Niemi' initials='A.' surname='Niemi'>
+         <organization>Huawei</organization>
+      </author>
+      <date day='4' month='March' year='2024'/>
+      <abstract>
+	 <t>   The TLS handshake protocol allows authentication of one or both peers
+   using static, long-term credentials.  In some cases, it is also
+   desirable to ensure that the peer runtime environment is in a secure
+   state.  Such an assurance can be achieved using attestation which is
+   a process by which an entity produces evidence about itself that
+   another party can use to appraise whether that entity is found in a
+   secure state.  This document describes a series of protocol
+   extensions to the TLS 1.3 handshake that enables the binding of the
+   TLS authentication key to a remote attestation session.  This enables
+   an entity capable of producing attestation evidence, such as a
+   confidential workload running in a Trusted Execution Environment
+   (TEE), or an IoT device that is trying to authenticate itself to a
+   network access point, to present a more comprehensive set of security
+   metrics to its peer.  These extensions have been designed to allow
+   the peers to use any attestation technology, in any remote
+   attestation topology, and mutually.
+
+	 </t>
+      </abstract>
+   </front>
+   <seriesInfo name='Internet-Draft' value='draft-fossati-tls-attestation-05'/>
+   
+</reference>
+
+
+<reference anchor="FDO" target="https://fidoalliance.org/specifications/download-iot-specifications/">
+  <front>
+    <title>FIDO Device Onboard Specification 1.1</title>
+    <author >
+      <organization>FIDO Alliance</organization>
+    </author>
+    <date year="2022" month="April"/>
+  </front>
+</reference>
+
+
+
+<reference anchor='I-D.ietf-opsawg-mud-acceptable-urls'>
+   <front>
+      <title>Authorized update to MUD URLs</title>
+      <author fullname='Michael Richardson' initials='M.' surname='Richardson'>
+         <organization>Sandelman Software Works</organization>
+      </author>
+      <author fullname='Wei Pan' initials='W.' surname='Pan'>
+         <organization>Huawei Technologies</organization>
+      </author>
+      <author fullname='Eliot Lear' initials='E.' surname='Lear'>
+         <organization>Cisco Systems</organization>
+      </author>
+      <date day='1' month='March' year='2024'/>
+      <abstract>
+	 <t>   This document provides a way for an RFC8520 Manufacturer Usage
+   Description (MUD) definitions to declare what are acceptable
+   replacement MUD URLs for a device.
+
+   RFCEDITOR-please-remove: this document is being worked on at:
+   https://github.com/mcr/iot-mud-acceptable-urls
+
+	 </t>
+      </abstract>
+   </front>
+   <seriesInfo name='Internet-Draft' value='draft-ietf-opsawg-mud-acceptable-urls-11'/>
+   
+</reference>
+
+<reference anchor='RFC8995'>
+  <front>
+    <title>Bootstrapping Remote Secure Key Infrastructure (BRSKI)</title>
+    <author fullname='M. Pritikin' initials='M.' surname='Pritikin'/>
+    <author fullname='M. Richardson' initials='M.' surname='Richardson'/>
+    <author fullname='T. Eckert' initials='T.' surname='Eckert'/>
+    <author fullname='M. Behringer' initials='M.' surname='Behringer'/>
+    <author fullname='K. Watsen' initials='K.' surname='Watsen'/>
+    <date month='May' year='2021'/>
+    <abstract>
+      <t>This document specifies automated bootstrapping of an Autonomic Control Plane. To do this, a Secure Key Infrastructure is bootstrapped. This is done using manufacturer-installed X.509 certificates, in combination with a manufacturer's authorizing service, both online and offline. We call this process the Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol. Bootstrapping a new device can occur when using a routable address and a cloud service, only link-local connectivity, or limited/disconnected networks. Support for deployment models with less stringent security requirements is included. Bootstrapping is complete when the cryptographic identity of the new key infrastructure is successfully deployed to the device. The established secure connection can be used to deploy a locally issued certificate to the device as well.</t>
+    </abstract>
+  </front>
+  <seriesInfo name='RFC' value='8995'/>
+  <seriesInfo name='DOI' value='10.17487/RFC8995'/>
+</reference>
+
+<reference anchor='RFC5280'>
+  <front>
+    <title>Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile</title>
+    <author fullname='D. Cooper' initials='D.' surname='Cooper'/>
+    <author fullname='S. Santesson' initials='S.' surname='Santesson'/>
+    <author fullname='S. Farrell' initials='S.' surname='Farrell'/>
+    <author fullname='S. Boeyen' initials='S.' surname='Boeyen'/>
+    <author fullname='R. Housley' initials='R.' surname='Housley'/>
+    <author fullname='W. Polk' initials='W.' surname='Polk'/>
+    <date month='May' year='2008'/>
+    <abstract>
+      <t>This memo profiles the X.509 v3 certificate and X.509 v2 certificate revocation list (CRL) for use in the Internet. An overview of this approach and model is provided as an introduction. The X.509 v3 certificate format is described in detail, with additional information regarding the format and semantics of Internet name forms. Standard certificate extensions are described and two Internet-specific extensions are defined. A set of required certificate extensions is specified. The X.509 v2 CRL format is described in detail along with standard and Internet-specific extensions. An algorithm for X.509 certification path validation is described. An ASN.1 module and examples are provided in the appendices. [STANDARDS-TRACK]</t>
+    </abstract>
+  </front>
+  <seriesInfo name='RFC' value='5280'/>
+  <seriesInfo name='DOI' value='10.17487/RFC5280'/>
+</reference>
+
 
 
 
     </references>
 
 
+<section numbered="no" anchor="acknowledgements"><name>Acknowledgements</name>
+
+<t>We would like to thank Roman Danyliw for his excellent review as the responsible security area director, Bahcet Sarikaya for his Genart review, Michael Richardson for his IoT directorate review and Susan Hares for her Opsdir review. During the IESG review Robert Wilton, Eliot Lear, Zaheduzzaman Sarker, Francesca Palombini, John Scudder, Paul Wouters, Éric Vyncke, and Murray Kucherawy.</t>
+
+</section>
 
 
   </back>
 
 <!-- ##markdown-source:
-H4sIAAAAAAAAA81aa3PbyLH9jl8xZafqShuRazubl+7u1qUsba0qkuXYUh6V
-SrmGwJCcCMAgMwNpubb2t+d0zwMARXudVD5cfbBJYDDTz9OnG5zNZoXXvlbH
-4q23pl2LhXPKem1aJ8xKnJtr8Ur5e2NvxaIslXPijfpnr61qVOtdIZdLq+7w
-8M35tbi8ORUXur2Va1VUpmxlg20rK1d+ppVfzVyv/azpq9mz3xSl9Gpt7PZY
-OF8Vhe7ssfC2d/7Fs2e/f/aikFZJbKvK3mq/LUiAtTV9F44qbtUWl6pjcd56
-ZVvlZ6d0TlE4L9vqnaxNi7O3yhWdPi6EsKtSVc5v63hVCG/K0UfdVtAnXXDG
-eqtWLn/fNpOv3uoyLy5Nw7ZI33Vb63Y4Rv3gZ7V2foZNlqbGspn54pe4Aws1
-sut0uw5rC9n7jbGQdoa79KdbrD6Zi0tjZRuvBaOeWNVWsp3cMXYtW/2jJN8d
-i4Vt4ItGe1XF+6qRuj4Wy/DovKFH5+SX/1vTnTn0KHbO/n4url25MSvV6vVE
-gO9l2yr3+O5UiOnJG35m7vMzOPiHOXxXFK2xDZ65U+SrN9+9/N2vXzyLH188
-f/77dPX5b7+ij+ezUxZ8ZqV3MyX95GKIMkixUm56pzROzRA5M7/pm2VnNTxe
-FLPZTMglfCpLSHK9UeJStv0K33qrrLhxCGdxqlxpdUdqiQPE+aFwnSr1Spes
-qqj4/hIm8dhAhkxBJIo2Js+qb0taKWuEs7AhhyqxMlZIPH2nS4U4FJ01nbL1
-Nq+HB0giZFY1EmEjHa1GUNaq9HymMyt/j6wRtm9bBJXAMroe9yZZtHeI1nal
-172VYfMTVcreKUp1v9HuiB9pjPMCoQlZrEaeCoQ3SU3CRkXpgLhz0jAqbUfw
-IHSwh0PMCBk+x73wsKoNRf9U+v1yFsUin9NZ5bAJjHev/QbWI+OsdK3EcjvY
-Uta1uXf45hXbkTRstFuqjbzT0ANrR9aZHD85mp6LmuE6ILKeU5BAMeRvT1pi
-j5WmZJDiXm7JLch/mCNgYgpEuj4S1axWypLyktAEuItIg1ErurSEokoF70Hl
-eQjRRldVrYriKUGeNVXPahXFDZDLivfvY9Y8PBxFpcgVHYAsHnvz5mKQAREu
-6UgdTommPRL3G11u6FKLWwBWJIEbm/k7kv2tsnfKFtisr71G3irEq1l6GXdL
-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
-AA==
+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
 
 -->
 
