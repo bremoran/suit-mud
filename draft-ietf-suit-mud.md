@@ -187,9 +187,7 @@ The intended workflow is as follows, and assumes an attestation mechanism betwee
 
   -  Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.
 
-* If the SUIT_MUD_container, see {{suit-extension}}, has been severed, the MUD Manager can use the suit-reference-uri to retrieve the complete SUIT manifest.
-* The manifest authenticity is verified by the MUD Manager, which enforces that the MUD file presented is also authentic and as intended by the device software vendor.
-* The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest. The SUIT manifest contains the MUD URL and not the MUD file primarily to the size of the MUD file.
+* The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest. The SUIT manifest contains the MUD URL and not the MUD file primarily to due the size of the MUD file. This also allows the MUD file to be updated rapidly in response to evolving threats.
 * The MUD Manager verifies the MUD file signature using the Subject Key Identifier (SKI) provided in the SUIT manifest.
 * Then, the MUD Manager can apply any appropriate policy as described by the MUD file.
 
