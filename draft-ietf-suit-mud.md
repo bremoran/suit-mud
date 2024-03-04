@@ -1,7 +1,7 @@
 ---
 title: Strong Assertions of IoT Network Access Requirements
 abbrev: SUIT MUD Linkage
-docname: draft-ietf-suit-mud-07
+docname: draft-ietf-suit-mud-08
 category: std
 
 ipr: trust200902
@@ -215,18 +215,12 @@ To enable strong assertions about the network access requirements that a device 
 The subject key identifier MUST be generated according to the process defined in {{I-D.ietf-cose-key-thumbprint}} and the SUIT_Digest structure MUST be populated with the selected hash algorithm and obtained fingerprint.
 The subject key identifier corresponds to the key used in the MUD signature file described in Section 13.2 of {{RFC8520}}.
 
-The following Concise Data Definition Language (CDDL) {{RFC8610}} describes the extension to the SUIT_Manifest structure:
+The extensions to the SUIT manifest are described using the Concise Data Definition Language (CDDL) {{RFC8610}}. 
+
+The extension to the SUIT_Manifest is described here:
 
 ~~~CDDL
-$$severable-manifest-members-choice-extensions //= (
-  suit-manifest-mud => SUIT_Digest / SUIT_MUD_container
-)
-~~~
-
-The SUIT_Envelope is also amended:
-
-~~~CDDL
-$$SUIT_severable-members-extensions //= (
+$$unseverable-manifest-member-extensions //= (
   suit-manifest-mud => bstr .cbor SUIT_MUD_container
 )
 ~~~
@@ -249,12 +243,6 @@ This specification links MUD files to SUIT manifests for improving security prot
 IANA is requested to add a new value to the SUIT manifest elements registry created with {{I-D.ietf-suit-manifest}}:
 
 - Label: TBD1 [[Value allocated from the standards action address range]]
-- Name: Manufacturer Usage Description (MUD)
-- Reference: [[TBD: This document]]
-
-IANA is requested to add a new value to the SUIT envelope elements registry created with {{I-D.ietf-suit-manifest}}:
-
-- Label: TBD2 [[Value allocated from the standards action address range]]
 - Name: Manufacturer Usage Description (MUD)
 - Reference: [[TBD: This document]]
 
