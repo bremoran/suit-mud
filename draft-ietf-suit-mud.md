@@ -104,7 +104,8 @@ The MUD manager must trust the MUD file server from which the MUD file is fetche
 It must also trust the device to report the correct MUD URL. In case of DHCP and LLDP the URL is unprotected and not bound
 to the device itself.
 
-When the MUD URL is included in a certificate then it is authenticated and integrity protected. There is a need to bind the entity that creates the software and configuration to the MUD file. The developer is in the best position to describe
+When the MUD URL is included in a certificate then it is authenticated and integrity protected. However, the certificate only proves possession of a private key and endorsements by the certificate issuer. This does not prove what software is in use, nor does it prove that the MUD file is the correct file for the deployed software: instead, the responsibility falls on the certificate issuer to identify the MUD URL correctly and to supply a MUD Signer correctly.
+There is a need to bind the entity that creates the software and configuration to the MUD file. The developer is in the best position to describe
 the communication requirements of the software it developed and configured for a device.
 
 This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest {{I-D.ietf-suit-manifest}}
@@ -247,6 +248,8 @@ SUIT_MUD_container = {
 # Security Considerations
 
 This specification links MUD files to SUIT manifests for improving security protection and ease of use. By including MUD URLs in SUIT manifests an extra layer of protection has been created and synchronization risks can be minimized.
+
+Used in this way, the MUD manager presents an additional layer of security on networks where they are enabled. The MUD manager configures the L2/L3 infrastructure of a Local Area Network to apply restrictive policies to certain devices. The MUD manager only has the ability to elevate or restrict the network privileges of a device. Therefore, attacks on the MUD Manager cannot compromise devices, they can only enable a compromised device to access more of the network. Further security considerations related to the MUD Manager are covered in {{RFC8520}}.
 
 If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning. This is, however,
 not a concern specific to this specification but rather to the use of MUD in general. Below are two mitigations:
