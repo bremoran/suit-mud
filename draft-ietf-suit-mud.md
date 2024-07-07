@@ -104,7 +104,7 @@ The MUD manager must trust the MUD file server from which the MUD file is fetche
 It must also trust the device to report the correct MUD URL. In case of DHCP and LLDP the URL is unprotected and not bound
 to the device itself.
 
-When the MUD URL is included in a certificate then it is authenticated and integrity protected. However, the certificate only proves posession of a private key and endorsements by the certificate issuer. This does not prove what software is in use, nor does it prove that the MUD file is the correct file for the deployed software: instead, the responsibility falls on the certificate issuer to identify the MUD URL correctly and to supply a MUD Signer correctly.
+When the MUD URL is included in a certificate then it is authenticated and integrity protected. However, the certificate only proves possession of a private key and endorsements by the certificate issuer. This does not prove what software is in use, nor does it prove that the MUD file is the correct file for the deployed software: instead, the responsibility falls on the certificate issuer to identify the MUD URL correctly and to supply a MUD Signer correctly.
 There is a need to bind the entity that creates the software and configuration to the MUD file. The developer is in the best position to describe
 the communication requirements of the software it developed and configured for a device.
 
