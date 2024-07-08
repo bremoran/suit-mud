@@ -14,10 +14,10 @@
     " name="description">
 <meta content="xml2rfc 3.17.1" name="generator">
 <meta content="Internet-Draft" name="keyword">
-<meta content="draft-ietf-suit-mud-08" name="ietf.draft">
+<meta content="draft-ietf-suit-mud-09" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.17.1
-    Python 3.11.5
+    Python 3.11.9
     appdirs 1.4.4
     ConfigArgParse 1.5.3
     google-i18n-address 2.5.2
@@ -27,7 +27,7 @@
     pycountry 22.3.5
     PyYAML 6.0
     requests 2.28.2
-    setuptools 68.1.2
+    setuptools 69.2.0
     six 1.16.0
     wcwidth 0.2.6
 -->
@@ -1205,11 +1205,11 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">SUIT MUD Linkage</td>
-<td class="right">March 2024</td>
+<td class="right">July 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Moran &amp; Tschofenig</td>
-<td class="center">Expires 5 September 2024</td>
+<td class="center">Expires 9 January 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1219,18 +1219,18 @@ li > p:last-of-type:only-child {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">SUIT</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-ietf-suit-mud-08</dd>
+<dd class="internet-draft">draft-ietf-suit-mud-09</dd>
 <dt class="label-updates">Updates:</dt>
 <dd class="updates">
 <a href="https://www.rfc-editor.org/rfc/rfcdraft-ietf-suit-manifest" class="eref">draft-ietf-suit-manifest</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-03-04" class="published">4 March 2024</time>
+<time datetime="2024-07-08" class="published">8 July 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-09-05">5 September 2024</time></dd>
+<dd class="expires"><time datetime="2025-01-09">9 January 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1269,7 +1269,7 @@ li > p:last-of-type:only-child {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 5 September 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 January 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1395,7 +1395,8 @@ Under <span>[<a href="#RFC8520" class="cite xref">RFC8520</a>]</span>, devices r
 <p id="section-1-7">The MUD manager must trust the MUD file server from which the MUD file is fetched to return the most up-to-date MUD file.
 It must also trust the device to report the correct MUD URL. In case of DHCP and LLDP the URL is unprotected and not bound
 to the device itself.<a href="#section-1-7" class="pilcrow">¶</a></p>
-<p id="section-1-8">When the MUD URL is included in a certificate then it is authenticated and integrity protected. There is a need to bind the entity that creates the software and configuration to the MUD file. The developer is in the best position to describe
+<p id="section-1-8">When the MUD URL is included in a certificate then it is authenticated and integrity protected. However, the certificate only proves possession of a private key and endorsements by the certificate issuer. This does not prove what software is in use, nor does it prove that the MUD file is the correct file for the deployed software: instead, the responsibility falls on the certificate issuer to identify the MUD URL correctly and to supply a MUD Signer correctly.
+There is a need to bind the entity that creates the software and configuration to the MUD file. The developer is in the best position to describe
 the communication requirements of the software it developed and configured for a device.<a href="#section-1-8" class="pilcrow">¶</a></p>
 <p id="section-1-9">This specification defines an extension to the Software Updates for Internet of Things (SUIT) manifest <span>[<a href="#I-D.ietf-suit-manifest" class="cite xref">I-D.ietf-suit-manifest</a>]</span>
 to include a MUD URL. A SUIT manifest is
@@ -1579,14 +1580,15 @@ SUIT_MUD_container = {
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
 <p id="section-6-1">This specification links MUD files to SUIT manifests for improving security protection and ease of use. By including MUD URLs in SUIT manifests an extra layer of protection has been created and synchronization risks can be minimized.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning. This is, however,
-not a concern specific to this specification but rather to the use of MUD in general. Below are two mitigations:<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-2">Used in this way, the MUD manager presents an additional layer of security on networks where they are enabled. The MUD manager configures the L2/L3 infrastructure of a Local Area Network to apply restrictive policies to certain devices. The MUD manager only has the ability to elevate or restrict the network privileges of a device. Therefore, attacks on the MUD Manager cannot compromise devices, they can only enable a compromised device to access more of the network. Further security considerations related to the MUD Manager are covered in <span>[<a href="#RFC8520" class="cite xref">RFC8520</a>]</span>.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning. This is, however,
+not a concern specific to this specification but rather to the use of MUD in general. Below are two mitigations:<a href="#section-6-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6-3.1">A manufacturer must update the MUD file in advance of network service or product changes so 
+<li class="normal" id="section-6-4.1">A manufacturer must update the MUD file in advance of network service or product changes so 
 that the new services can be supported. Because the MUD file is accessed by a URL means that it can be subsequently updated. This requires a MUD file being retrieved again. This handles the case when the device 
-is already deployed and in use.<a href="#section-6-3.1" class="pilcrow">¶</a>
+is already deployed and in use.<a href="#section-6-4.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-6-3.2">There is a possibility that an IoT device has remained on-shelf inventory for an extended period, resulting in its MUD file being inaccessible at its previous location. This necessitates a decision on how to implement a fail-safe tailored to the particular environment.<a href="#section-6-3.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-6-4.2">There is a possibility that an IoT device has remained on-shelf inventory for an extended period, resulting in its MUD file being inaccessible at its previous location. This necessitates a decision on how to implement a fail-safe tailored to the particular environment.<a href="#section-6-4.2" class="pilcrow">¶</a>
 </li>
       </ul>
 </section>
@@ -1618,11 +1620,11 @@ is already deployed and in use.<a href="#section-6-3.1" class="pilcrow">¶</a>
 <dl class="references">
 <dt id="I-D.ietf-cose-key-thumbprint">[I-D.ietf-cose-key-thumbprint]</dt>
         <dd>
-<span class="refAuthor">Isobe, K.</span>, <span class="refAuthor">Tschofenig, H.</span>, and <span class="refAuthor">O. Steele</span>, <span class="refTitle">"CBOR Object Signing and Encryption (COSE) Key Thumbprint"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-cose-key-thumbprint-04</span>, <time datetime="2023-10-23" class="refDate">23 October 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-04">https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-04</a>&gt;</span>. </dd>
+<span class="refAuthor">Isobe, K.</span>, <span class="refAuthor">Tschofenig, H.</span>, and <span class="refAuthor">O. Steele</span>, <span class="refTitle">"CBOR Object Signing and Encryption (COSE) Key Thumbprint"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-cose-key-thumbprint-05</span>, <time datetime="2024-07-08" class="refDate">8 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-05">https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-05</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-rats-eat">[I-D.ietf-rats-eat]</dt>
         <dd>
-<span class="refAuthor">Lundblade, L.</span>, <span class="refAuthor">Mandyam, G.</span>, <span class="refAuthor">O'Donoghue, J.</span>, and <span class="refAuthor">C. Wallace</span>, <span class="refTitle">"The Entity Attestation Token (EAT)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-eat-25</span>, <time datetime="2024-01-15" class="refDate">15 January 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-25">https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-25</a>&gt;</span>. </dd>
+<span class="refAuthor">Lundblade, L.</span>, <span class="refAuthor">Mandyam, G.</span>, <span class="refAuthor">O'Donoghue, J.</span>, and <span class="refAuthor">C. Wallace</span>, <span class="refTitle">"The Entity Attestation Token (EAT)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-eat-29</span>, <time datetime="2024-07-08" class="refDate">8 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-29">https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-29</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-suit-manifest">[I-D.ietf-suit-manifest]</dt>
         <dd>
@@ -1661,7 +1663,7 @@ is already deployed and in use.<a href="#section-6-3.1" class="pilcrow">¶</a>
 <dd class="break"></dd>
 <dt id="I-D.fossati-tls-attestation">[I-D.fossati-tls-attestation]</dt>
         <dd>
-<span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Howard, P.</span>, <span class="refAuthor">Mihalcea, I.</span>, <span class="refAuthor">Deshpande, Y.</span>, and <span class="refAuthor">A. Niemi</span>, <span class="refTitle">"Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-fossati-tls-attestation-05</span>, <time datetime="2024-03-04" class="refDate">4 March 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-fossati-tls-attestation-05">https://datatracker.ietf.org/doc/html/draft-fossati-tls-attestation-05</a>&gt;</span>. </dd>
+<span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Howard, P.</span>, <span class="refAuthor">Mihalcea, I.</span>, <span class="refAuthor">Deshpande, Y.</span>, <span class="refAuthor">Niemi, A.</span>, and <span class="refAuthor">T. Fossati</span>, <span class="refTitle">"Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-fossati-tls-attestation-07</span>, <time datetime="2024-07-08" class="refDate">8 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-fossati-tls-attestation-07">https://datatracker.ietf.org/doc/html/draft-fossati-tls-attestation-07</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-opsawg-mud-acceptable-urls">[I-D.ietf-opsawg-mud-acceptable-urls]</dt>
         <dd>

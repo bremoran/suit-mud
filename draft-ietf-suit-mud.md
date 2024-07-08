@@ -2,7 +2,7 @@
 title: Strong Assertions of IoT Network Access Requirements
 abbrev: SUIT MUD Linkage
 updates: draft-ietf-suit-manifest
-docname: draft-ietf-suit-mud-08
+docname: draft-ietf-suit-mud-09
 category: std
 
 ipr: trust200902

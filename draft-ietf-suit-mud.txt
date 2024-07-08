@@ -5,12 +5,12 @@
 SUIT                                                            B. Moran
 Internet-Draft                                               Arm Limited
 Updates: draft-ietf-suit-manifest (if approved)            H. Tschofenig
-Intended status: Standards Track                            4 March 2024
-Expires: 5 September 2024
+Intended status: Standards Track                             8 July 2024
+Expires: 9 January 2025
 
 
           Strong Assertions of IoT Network Access Requirements
-                         draft-ietf-suit-mud-08
+                         draft-ietf-suit-mud-09
 
 Abstract
 
@@ -45,7 +45,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 September 2024.
+   This Internet-Draft will expire on 9 January 2025.
 
 
 
@@ -53,9 +53,9 @@ Status of This Memo
 
 
 
-Moran & Tschofenig      Expires 5 September 2024                [Page 1]
+Moran & Tschofenig       Expires 9 January 2025                 [Page 1]
 
-Internet-Draft              SUIT MUD Linkage                  March 2024
+Internet-Draft              SUIT MUD Linkage                   July 2024
 
 
 Copyright Notice
@@ -82,7 +82,7 @@ Table of Contents
      4.2.  Cons  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
    5.  Extensions to SUIT  . . . . . . . . . . . . . . . . . . . . .   7
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
      8.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
      8.2.  Informative References  . . . . . . . . . . . . . . . . .  10
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Moran & Tschofenig      Expires 5 September 2024                [Page 2]
+Moran & Tschofenig       Expires 9 January 2025                 [Page 2]
 
-Internet-Draft              SUIT MUD Linkage                  March 2024
+Internet-Draft              SUIT MUD Linkage                   July 2024
 
 
        .......................................
@@ -149,11 +149,26 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
    LLDP the URL is unprotected and not bound to the device itself.
 
    When the MUD URL is included in a certificate then it is
-   authenticated and integrity protected.  There is a need to bind the
-   entity that creates the software and configuration to the MUD file.
-   The developer is in the best position to describe the communication
-   requirements of the software it developed and configured for a
-   device.
+   authenticated and integrity protected.  However, the certificate only
+   proves possession of a private key and endorsements by the
+   certificate issuer.  This does not prove what software is in use, nor
+   does it prove that the MUD file is the correct file for the deployed
+   software: instead, the responsibility falls on the certificate issuer
+   to identify the MUD URL correctly and to supply a MUD Signer
+   correctly.  There is a need to bind the entity that creates the
+   software and configuration to the MUD file.  The developer is in the
+   best position to describe the communication requirements of the
+   software it developed and configured for a device.
+
+
+
+
+
+
+Moran & Tschofenig       Expires 9 January 2025                 [Page 3]
+
+Internet-Draft              SUIT MUD Linkage                   July 2024
+
 
    This specification defines an extension to the Software Updates for
    Internet of Things (SUIT) manifest [I-D.ietf-suit-manifest] to
@@ -161,14 +176,6 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
    code/data for an IoT device, where to find the code/data, the devices
    to which it applies, and cryptographic information protecting the
    manifest.
-
-
-
-
-Moran & Tschofenig      Expires 5 September 2024                [Page 3]
-
-Internet-Draft              SUIT MUD Linkage                  March 2024
-
 
    When combining a MUD URL with a manifest used for software/firmware
    updates then a network operator can gain more confidence in the
@@ -214,16 +221,9 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
 
 
 
-
-
-
-
-
-
-
-Moran & Tschofenig      Expires 5 September 2024                [Page 4]
+Moran & Tschofenig       Expires 9 January 2025                 [Page 4]
 
-Internet-Draft              SUIT MUD Linkage                  March 2024
+Internet-Draft              SUIT MUD Linkage                   July 2024
 
 
                            ____________
@@ -277,9 +277,9 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
 
 
 
-Moran & Tschofenig      Expires 5 September 2024                [Page 5]
+Moran & Tschofenig       Expires 9 January 2025                 [Page 5]
 
-Internet-Draft              SUIT MUD Linkage                  March 2024
+Internet-Draft              SUIT MUD Linkage                   July 2024
 
 
       protocol (for example using the EAP-TLS 1.3 method [RFC9190]
@@ -333,9 +333,9 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
 
 
 
-Moran & Tschofenig      Expires 5 September 2024                [Page 6]
+Moran & Tschofenig       Expires 9 January 2025                 [Page 6]
 
-Internet-Draft              SUIT MUD Linkage                  March 2024
+Internet-Draft              SUIT MUD Linkage                   July 2024
 
 
    *  The author explicitly authorizes a key to sign MUD files,
@@ -389,9 +389,9 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
 
 
 
-Moran & Tschofenig      Expires 5 September 2024                [Page 7]
+Moran & Tschofenig       Expires 9 January 2025                 [Page 7]
 
-Internet-Draft              SUIT MUD Linkage                  March 2024
+Internet-Draft              SUIT MUD Linkage                   July 2024
 
 
    The following Concise Data Definition Language (CDDL) [RFC8610]
@@ -417,6 +417,16 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
    manifests an extra layer of protection has been created and
    synchronization risks can be minimized.
 
+   Used in this way, the MUD manager presents an additional layer of
+   security on networks where they are enabled.  The MUD manager
+   configures the L2/L3 infrastructure of a Local Area Network to apply
+   restrictive policies to certain devices.  The MUD manager only has
+   the ability to elevate or restrict the network privileges of a
+   device.  Therefore, attacks on the MUD Manager cannot compromise
+   devices, they can only enable a compromised device to access more of
+   the network.  Further security considerations related to the MUD
+   Manager are covered in [RFC8520].
+
    If the MUD file and the software/firmware loaded onto the device gets
    out-of-sync a device may be firewalled and, with firewalling by
    networks in place, the device may stop functioning.  This is,
@@ -430,6 +440,16 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
       retrieved again.  This handles the case when the device is already
       deployed and in use.
 
+
+
+
+
+
+Moran & Tschofenig       Expires 9 January 2025                 [Page 8]
+
+Internet-Draft              SUIT MUD Linkage                   July 2024
+
+
    *  There is a possibility that an IoT device has remained on-shelf
       inventory for an extended period, resulting in its MUD file being
       inaccessible at its previous location.  This necessitates a
@@ -440,15 +460,6 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
 
    IANA is requested to add a new value to the SUIT manifest elements
    registry created with [I-D.ietf-suit-manifest]:
-
-
-
-
-
-Moran & Tschofenig      Expires 5 September 2024                [Page 8]
-
-Internet-Draft              SUIT MUD Linkage                  March 2024
-
 
    *  Label: TBD1 [[Value allocated from the standards action address
       range]]
@@ -465,16 +476,15 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
               Isobe, K., Tschofenig, H., and O. Steele, "CBOR Object
               Signing and Encryption (COSE) Key Thumbprint", Work in
               Progress, Internet-Draft, draft-ietf-cose-key-thumbprint-
-              04, 23 October 2023,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-cose-
-              key-thumbprint-04>.
+              05, 8 July 2024, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-cose-key-thumbprint-05>.
 
    [I-D.ietf-rats-eat]
               Lundblade, L., Mandyam, G., O'Donoghue, J., and C.
               Wallace, "The Entity Attestation Token (EAT)", Work in
-              Progress, Internet-Draft, draft-ietf-rats-eat-25, 15
-              January 2024, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-rats-eat-25>.
+              Progress, Internet-Draft, draft-ietf-rats-eat-29, 8 July
+              2024, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              rats-eat-29>.
 
    [I-D.ietf-suit-manifest]
               Moran, B., Tschofenig, H., Birkholz, H., Zandberg, K., and
@@ -484,6 +494,17 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
               Internet-Draft, draft-ietf-suit-manifest-25, 5 February
               2024, <https://datatracker.ietf.org/doc/html/draft-ietf-
               suit-manifest-25>.
+
+
+
+
+
+
+
+Moran & Tschofenig       Expires 9 January 2025                 [Page 9]
+
+Internet-Draft              SUIT MUD Linkage                   July 2024
+
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -498,13 +519,6 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
               Description Specification", RFC 8520,
               DOI 10.17487/RFC8520, March 2019,
               <https://www.rfc-editor.org/rfc/rfc8520>.
-
-
-
-Moran & Tschofenig      Expires 5 September 2024                [Page 9]
-
-Internet-Draft              SUIT MUD Linkage                  March 2024
-
 
    [RFC8610]  Birkholz, H., Vigano, C., and C. Bormann, "Concise Data
               Definition Language (CDDL): A Notational Convention to
@@ -525,12 +539,12 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
 
    [I-D.fossati-tls-attestation]
               Tschofenig, H., Sheffer, Y., Howard, P., Mihalcea, I.,
-              Deshpande, Y., and A. Niemi, "Using Attestation in
-              Transport Layer Security (TLS) and Datagram Transport
-              Layer Security (DTLS)", Work in Progress, Internet-Draft,
-              draft-fossati-tls-attestation-05, 4 March 2024,
-              <https://datatracker.ietf.org/doc/html/draft-fossati-tls-
-              attestation-05>.
+              Deshpande, Y., Niemi, A., and T. Fossati, "Using
+              Attestation in Transport Layer Security (TLS) and Datagram
+              Transport Layer Security (DTLS)", Work in Progress,
+              Internet-Draft, draft-fossati-tls-attestation-07, 8 July
+              2024, <https://datatracker.ietf.org/doc/html/draft-
+              fossati-tls-attestation-07>.
 
    [I-D.ietf-opsawg-mud-acceptable-urls]
               Richardson, M., Pan, W., and E. Lear, "Authorized update
@@ -538,6 +552,15 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
               ietf-opsawg-mud-acceptable-urls-11, 1 March 2024,
               <https://datatracker.ietf.org/doc/html/draft-ietf-opsawg-
               mud-acceptable-urls-11>.
+
+
+
+
+
+Moran & Tschofenig       Expires 9 January 2025                [Page 10]
+
+Internet-Draft              SUIT MUD Linkage                   July 2024
+
 
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
@@ -554,13 +577,6 @@ Internet-Draft              SUIT MUD Linkage                  March 2024
               Extensible Authentication Protocol with TLS 1.3",
               RFC 9190, DOI 10.17487/RFC9190, February 2022,
               <https://www.rfc-editor.org/rfc/rfc9190>.
-
-
-
-Moran & Tschofenig      Expires 5 September 2024               [Page 10]
-
-Internet-Draft              SUIT MUD Linkage                  March 2024
-
 
 Acknowledgements
 
@@ -597,20 +613,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Moran & Tschofenig      Expires 5 September 2024               [Page 11]
+Moran & Tschofenig       Expires 9 January 2025                [Page 11]
