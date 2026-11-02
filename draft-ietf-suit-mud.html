@@ -8,30 +8,29 @@
 <meta content="Brendan Moran" name="author">
 <meta content="Hannes Tschofenig" name="author">
 <meta content="
-       The Manufacturer Usage Description (MUD) specification describes the access and network functionality required for a device to properly function. This description has to reflect the software running on the device and its configuration. Because of this, the most appropriate entity for describing device network access requirements is the same as the entity developing the software and its configuration. 
-       A network presented with a MUD file by a device allows detection of misbehavior by the device software and configuration of access control. 
-       This document defines a way to link the Software Updates for Internet of Things (SUIT) manifest to a MUD file offering a stronger binding between the two. 
+       The Manufacturer Usage Description (MUD) specification describes the access and network functionality required for a device to properly function. This description has to reflect the software running on the device and its configuration. Because of this, the most appropriate entity for describing device network access requirements is the same as the entity developing the software and its configuration.
+       A network presented with a MUD file by a device allows detection of misbehavior by the device software and configuration of access control.
+       This document defines a way to link the Software Updates for Internet of Things (SUIT) manifest to a MUD file offering a stronger binding between the two.
     " name="description">
-<meta content="xml2rfc 3.17.1" name="generator">
+<meta content="xml2rfc 3.34.0" name="generator">
 <meta content="Internet-Draft" name="keyword">
-<meta content="draft-ietf-suit-mud-09" name="ietf.draft">
+<meta content="draft-ietf-suit-mud-11" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.17.1
-    Python 3.11.9
-    appdirs 1.4.4
-    ConfigArgParse 1.5.3
-    google-i18n-address 2.5.2
-    intervaltree 3.1.0
-    Jinja2 3.1.2
-    lxml 4.9.2
-    pycountry 22.3.5
-    PyYAML 6.0
-    requests 2.28.2
-    setuptools 69.2.0
-    six 1.16.0
-    wcwidth 0.2.6
+  xml2rfc 3.34.0
+    Python 3.14.6
+    ConfigArgParse 1.7.5
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
+    pycountry 26.2.16
+    PyYAML 6.0.3
+    requests 2.34.2
+    wcwidth 0.7.0
 -->
-<link href="draft-ietf-suit-mud.xml" rel="alternate" type="application/rfc+xml">
+<link href="draft-ietf-suit-mud-11.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
 <style type="text/css">/*
 
@@ -47,9 +46,9 @@
 */
 
 /* fonts */
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans'); /* Sans-serif */
-@import url('https://fonts.googleapis.com/css?family=Noto+Serif'); /* Serif (print) */
-@import url('https://fonts.googleapis.com/css?family=Roboto+Mono'); /* Monospace */
+@import url('https://static.ietf.org/fonts/noto-sans/import.css'); /* Sans-serif */
+@import url('https://static.ietf.org/fonts/noto-serif/import.css'); /* Serif (print) */
+@import url('https://static.ietf.org/fonts/roboto-mono/import.css'); /* Monospace */
 
 :root {
   --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
@@ -76,6 +75,7 @@ body {
   font-family: var(--font-sans);
   line-height: 1.6;
   scroll-behavior: smooth;
+  overflow-wrap: break-word;
 }
 .ears {
   display: none;
@@ -162,6 +162,12 @@ div {
 svg {
   display: block;
 }
+@media print {
+  svg {
+    max-height: 850px;
+    max-width: 660px;
+  }
+}
 svg[font-family~="serif" i], svg [font-family~="serif" i] {
   font-family: var(--font-serif);
 }
@@ -226,7 +232,7 @@ dl > dt {
   float: left;
   margin-right: 1em;
 }
-/* 
+/*
 dl.nohang > dt {
   float: none;
 }
@@ -254,8 +260,7 @@ a[href]:hover {
   background-color: #f2f2f2;
 }
 figcaption a[href],
-a[href].selfRef,
-.iref + a[href].internal {
+a[href].selfRef {
   color: #222;
 }
 /* XXX probably not this:
@@ -307,10 +312,16 @@ blockquote {
   border-radius: 3px;
   margin: 1em 0;
 }
+blockquote > *:last-child {
+  margin-bottom: 0;
+}
 cite {
   display: block;
   text-align: right;
   font-style: italic;
+}
+.xref {
+  overflow-wrap: normal;
 }
 
 /* tables */
@@ -400,7 +411,7 @@ hr {
 /* Fix PDF info block run off issue */
 @media print {
   #identifiers dd {
-    float: none;
+    max-width: 100%;
   }
 }
 #identifiers .authors .author {
@@ -453,6 +464,10 @@ nav.toc li {
 }
 
 .refInstance {
+  margin-bottom: 1.25em;
+}
+
+.refSubseries {
   margin-bottom: 1.25em;
 }
 
@@ -644,7 +659,6 @@ hr.addr {
 /* pagination */
 @media print {
   body {
-
     width: 100%;
   }
   p {
@@ -1073,7 +1087,7 @@ table {
 ol.type-a { list-style-type: lower-alpha; }
 ol.type-A { list-style-type: upper-alpha; }
 ol.type-i { list-style-type: lower-roman; }
-ol.type-I { list-style-type: lower-roman; }
+ol.type-I { list-style-type: upper-roman; }
 /* Apply the print table and row borders in general, on request from the RPC,
 and increase the contrast between border and odd row background slightly */
 table {
@@ -1153,7 +1167,7 @@ section .olCompact {
 tt, code {
   background-color: transparent;
 }
-p tt, p code, li tt, li code {
+p tt, p code, li tt, li code, dt tt, dt code {
   background-color: #f8f8f8;
 }
 /* Tweak the pre margin -- 0px doesn't come out well */
@@ -1176,6 +1190,7 @@ dl > dd > dl {
 /* This should match the element list in writer.text.TextWriter.render_dl() */
 dd > div.artwork:first-child,
 dd > aside:first-child,
+dd > blockquote:first-child,
 dd > figure:first-child,
 dd > ol:first-child,
 dd > div.sourcecode:first-child,
@@ -1200,16 +1215,15 @@ li > p:last-of-type:only-child {
 <script type="application/javascript">async function addMetadata(){try{const e=document.styleSheets[0].cssRules;for(let t=0;t<e.length;t++)if(/#identifiers/.exec(e[t].selectorText)){const a=e[t].cssText.replace("#identifiers","#external-updates");document.styleSheets[0].insertRule(a,document.styleSheets[0].cssRules.length)}}catch(e){console.log(e)}const e=document.getElementById("external-metadata");if(e)try{var t,a="",o=function(e){const t=document.getElementsByTagName("meta");for(let a=0;a<t.length;a++)if(t[a].getAttribute("name")===e)return t[a].getAttribute("content");return""}("rfc.number");if(o){t="https://www.rfc-editor.org/rfc/rfc"+o+".json";try{const e=await fetch(t);a=await e.json()}catch(e){t=document.URL.indexOf("html")>=0?document.URL.replace(/html$/,"json"):document.URL+".json";const o=await fetch(t);a=await o.json()}}if(!a)return;e.style.display="block";const s="",d="https://datatracker.ietf.org/doc",n="https://datatracker.ietf.org/ipr/search",c="https://www.rfc-editor.org/info",l=a.doc_id.toLowerCase(),i=a.doc_id.slice(0,3).toLowerCase(),f=a.doc_id.slice(3).replace(/^0+/,""),u={status:"Status",obsoletes:"Obsoletes",obsoleted_by:"Obsoleted By",updates:"Updates",updated_by:"Updated By",see_also:"See Also",errata_url:"Errata"};let h="<dl style='overflow:hidden' id='external-updates'>";["status","obsoletes","obsoleted_by","updates","updated_by","see_also","errata_url"].forEach(e=>{if("status"==e){a[e]=a[e].toLowerCase();var t=a[e].split(" "),o=t.length,w="",p=1;for(let e=0;e<o;e++)p<o?w=w+r(t[e])+" ":w+=r(t[e]),p++;a[e]=w}else if("obsoletes"==e||"obsoleted_by"==e||"updates"==e||"updated_by"==e){var g,m="",b=1;g=a[e].length;for(let t=0;t<g;t++)a[e][t]&&(a[e][t]=String(a[e][t]).toLowerCase(),m=b<g?m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>, ":m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>",b++);a[e]=m}else if("see_also"==e){var y,L="",C=1;y=a[e].length;for(let t=0;t<y;t++)if(a[e][t]){a[e][t]=String(a[e][t]);var _=a[e][t].slice(0,3),v=a[e][t].slice(3).replace(/^0+/,"");L=C<y?"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>, ":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>, ":"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>",C++}a[e]=L}else if("errata_url"==e){var R="";R=a[e]?R+"<a href='"+a[e]+"'>Errata exist</a> | <a href='"+d+"/"+l+"'>Datatracker</a>| <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>":"<a href='"+d+"/"+l+"'>Datatracker</a> | <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>",a[e]=R}""!=a[e]?"Errata"==u[e]?h+=`<dt>More info:</dt><dd>${a[e]}</dd>`:h+=`<dt>${u[e]}:</dt><dd>${a[e]}</dd>`:"Errata"==u[e]&&(h+=`<dt>More info:</dt><dd>${a[e]}</dd>`)}),h+="</dl>",e.innerHTML=h}catch(e){console.log(e)}else console.log("Could not locate metadata <div> element");function r(e){return e.charAt(0).toUpperCase()+e.slice(1)}}window.removeEventListener("load",addMetadata),window.addEventListener("load",addMetadata);</script>
 </head>
 <body class="xml2rfc">
-<script src="metadata.min.js"></script>
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">SUIT MUD Linkage</td>
-<td class="right">July 2024</td>
+<td class="right">November 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Moran &amp; Tschofenig</td>
-<td class="center">Expires 9 January 2025</td>
+<td class="center">Expires 6 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1219,18 +1233,18 @@ li > p:last-of-type:only-child {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">SUIT</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-ietf-suit-mud-09</dd>
+<dd class="internet-draft">draft-ietf-suit-mud-11</dd>
 <dt class="label-updates">Updates:</dt>
 <dd class="updates">
 <a href="https://www.rfc-editor.org/rfc/rfcdraft-ietf-suit-manifest" class="eref">draft-ietf-suit-manifest</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-07-08" class="published">8 July 2024</time>
+<time datetime="2026-11-02" class="published">2 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-01-09">9 January 2025</time></dd>
+<dd class="expires"><time datetime="2027-05-06">6 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1269,7 +1283,7 @@ li > p:last-of-type:only-child {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 January 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1278,7 +1292,7 @@ li > p:last-of-type:only-child {
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2024 IETF Trust and the persons identified as the
+            Copyright (c) 2026 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1385,11 +1399,14 @@ Under <span>[<a href="#RFC8520" class="cite xref">RFC8520</a>]</span>, devices r
 </div>
 <p id="section-1-5">RFC 8520 envisions different approaches for conveying the MUD URL from the device to the operational network. Section 4 of <span>[<a href="#I-D.ietf-opsawg-mud-acceptable-urls" class="cite xref">I-D.ietf-opsawg-mud-acceptable-urls</a>]</span> provides additional description of the MUD URLs sources, which include:<a href="#section-1-5" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-1-6.1">DHCP,<a href="#section-1-6.1" class="pilcrow">¶</a>
+<li class="normal" id="section-1-6.1">
+          <p id="section-1-6.1.1">DHCP,<a href="#section-1-6.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-6.2">IEEE 802.1AB Link Layer Discovery Protocol (LLDP), and<a href="#section-1-6.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-6.2">
+          <p id="section-1-6.2.1">IEEE 802.1AB Link Layer Discovery Protocol (LLDP), and<a href="#section-1-6.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-6.3">IEEE 802.1X whereby the URL to the MUD file would be contained in the certificate used in an EAP method.<a href="#section-1-6.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-1-6.3">
+          <p id="section-1-6.3.1">Device Certificates, such as IEEE 802.1X, whereby the URL to the MUD File would be contained in the certificate.<a href="#section-1-6.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-1-7">The MUD manager must trust the MUD file server from which the MUD file is fetched to return the most up-to-date MUD file.
@@ -1403,7 +1420,7 @@ to include a MUD URL. A SUIT manifest is
    a bundle of metadata about code/data for an IoT device, where to find the code/data, the
    devices to which it applies, and cryptographic information protecting
    the manifest.<a href="#section-1-9" class="pilcrow">¶</a></p>
-<p id="section-1-10">When combining a MUD URL with a manifest used for software/firmware updates then a network operator can gain
+<p id="section-1-10">When combining a MUD URL with a manifest used for software/firmware updates then a network operator has
 more confidence in the description of the communication requirements for a device to properly function.<a href="#section-1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1480,19 +1497,26 @@ retrieving the manifest, the MUD file can be obtained as well.<a href="#section-
 </div>
 <p id="section-3-3">The intended workflow is as follows, and assumes an attestation mechanism between the device and the MUD Manager:<a href="#section-3-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3-4.1">At the time of onboarding, devices report their manifest in use to the MUD Manager via some form of attestation Evidence and a conveyance protocol. The device thereby acts as an Attester. The normative specification of these mechanisms is out of scope for this document.<a href="#section-3-4.1" class="pilcrow">¶</a>
+<li class="normal" id="section-3-4.1">
+          <p id="section-3-4.1.1">At the time of onboarding, devices report their manifest in use to the MUD Manager via some form of attestation Evidence and a conveyance protocol. The device thereby acts as an Attester. The normative specification of these mechanisms is out of scope for this document.<a href="#section-3-4.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-4.2">An example of an Evidence format is the Entity Attestation Token (EAT) <span>[<a href="#I-D.ietf-rats-eat" class="cite xref">I-D.ietf-rats-eat</a>]</span>, which offers a rich set of claims. This specification assumes that Evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of <span>[<a href="#I-D.ietf-rats-eat" class="cite xref">I-D.ietf-rats-eat</a>]</span>) or that the manifest itself is embedded in the Evidence. This Evidence is conveyed to the operational network via some protocol, such as network access authentication protocol (for example using the EAP-TLS 1.3 method <span>[<a href="#RFC9190" class="cite xref">RFC9190</a>]</span> utilizing the attestation extensions <span>[<a href="#I-D.fossati-tls-attestation" class="cite xref">I-D.fossati-tls-attestation</a>]</span>) or an onboarding protocol like FIDO Device Onboard (FDO) <span>[<a href="#FDO" class="cite xref">FDO</a>]</span> or Bootstrapping Remote Secure Key Infrastructure (BRSKI) <span>[<a href="#RFC8995" class="cite xref">RFC8995</a>]</span>.<a href="#section-3-4.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-4.2">
+          <p id="section-3-4.2.1">An example of an Evidence format is the Entity Attestation Token (EAT) <span>[<a href="#I-D.ietf-rats-eat" class="cite xref">I-D.ietf-rats-eat</a>]</span>, which offers a rich set of claims. This specification assumes that Evidence includes a link to the SUIT manifest via the "manifests" claim (see Section 4.2.15 of <span>[<a href="#I-D.ietf-rats-eat" class="cite xref">I-D.ietf-rats-eat</a>]</span>) or that the manifest itself is embedded in the Evidence. This Evidence is conveyed to the operational network via some protocol, such as network access authentication protocol (for example using the EAP-TLS 1.3 method <span>[<a href="#RFC9190" class="cite xref">RFC9190</a>]</span> utilizing the attestation extensions <span>[<a href="#I-D.fossati-tls-attestation" class="cite xref">I-D.fossati-tls-attestation</a>]</span>) or an onboarding protocol like FIDO Device Onboard (FDO) <span>[<a href="#FDO" class="cite xref">FDO</a>]</span> or Bootstrapping Remote Secure Key Infrastructure (BRSKI) <span>[<a href="#RFC8995" class="cite xref">RFC8995</a>]</span>.<a href="#section-3-4.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-4.3">The MUD Manager, acting as a Relying Party, relays the Evidence to the Verifier and receives an Attestation Result in response. This allows the MUD Manager to check that the device is operating with the expected version of software and configuration.<a href="#section-3-4.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-4.3">
+          <p id="section-3-4.3.1">The MUD Manager, acting as a Relying Party, relays the Evidence to the Verifier and receives an Attestation Result in response. This allows the MUD Manager to check that the device is operating with the expected version of software and configuration.<a href="#section-3-4.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-4.4">Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.<a href="#section-3-4.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-4.4">
+          <p id="section-3-4.4.1">Since a URL to the manifest is contained in the Evidence, the MUD Manager can look up the corresponding manifest.<a href="#section-3-4.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-4.5">The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest. The SUIT manifest contains the MUD URL and not the MUD file primarily to due the size of the MUD file. This also allows the MUD file to be updated rapidly in response to evolving threats.<a href="#section-3-4.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-4.5">
+          <p id="section-3-4.5.1">The MUD Manager acquires the MUD file from the MUD URL found in the SUIT manifest. The SUIT manifest contains the MUD URL and not the MUD file primarily to due the size of the MUD file. This also allows the MUD file to be updated rapidly in response to evolving threats.<a href="#section-3-4.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-4.6">The MUD Manager verifies the MUD file signature using the Subject Key Identifier (SKI) provided in the SUIT manifest.<a href="#section-3-4.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-4.6">
+          <p id="section-3-4.6.1">The MUD Manager verifies the MUD file signature using the Subject Key Identifier (SKI) provided in the SUIT manifest.<a href="#section-3-4.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-3-4.7">Then, the MUD Manager can apply any appropriate policy as described by the MUD file.<a href="#section-3-4.7" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-4.7">
+          <p id="section-3-4.7.1">Then, the MUD Manager can apply any appropriate policy as described by the MUD file.<a href="#section-3-4.7.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-3-5">Each time a device is updated, rebooted, or otherwise substantially changed, it will execute the remote attestation procedures again.<a href="#section-3-5" class="pilcrow">¶</a></p>
@@ -1511,26 +1535,34 @@ retrieving the manifest, the MUD file can be obtained as well.<a href="#section-
         </h3>
 <p id="section-4.1-1">The approach described in this document has several advantages over the RFC 8520 MUD URL reporting mechanisms:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.1-2.1">The MUD URL is tightly coupled to device software/firmware version.<a href="#section-4.1-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.1-2.1">
+            <p id="section-4.1-2.1.1">The MUD URL is tightly coupled to device software/firmware version.<a href="#section-4.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-4.1-2.2">The device does not report the MUD URL, so the device cannot tamper with the MUD URL.<a href="#section-4.1-2.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.2">
+            <p id="section-4.1-2.2.1">The device does not report the MUD URL, so the device cannot tamper with the MUD URL.<a href="#section-4.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-4.1-2.3">The author explicitly authorizes a key to sign MUD files, providing a tight coupling between the party that knows device behavior best (the author of the software/firmware) and the party that declares device behavior (MUD file signer).<a href="#section-4.1-2.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.3">
+            <p id="section-4.1-2.3.1">The author explicitly authorizes a key to sign MUD files, providing a tight coupling between the party that knows device behavior best (the author of the software/firmware) and the party that declares device behavior (MUD file signer).<a href="#section-4.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-4.1-2.4">Network operators do not need to know, a priori, which MUD URL to use for each device; this can be harvested from the device's manifest and only replaced if necessary.<a href="#section-4.1-2.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.4">
+            <p id="section-4.1-2.4.1">Network operators do not need to know, a priori, which MUD URL to use for each device; this can be harvested from the device's manifest and only replaced if necessary.<a href="#section-4.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-4.1-2.5">
             <p id="section-4.1-2.5.1">A network operator can still replace a MUD URL in a SUIT manifest:<a href="#section-4.1-2.5.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.1-2.5.2.1">By providing a SUIT manifest that overrides the MUD URL.<a href="#section-4.1-2.5.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.1-2.5.2.1">
+                <p id="section-4.1-2.5.2.1.1">By providing a SUIT manifest that overrides the MUD URL.<a href="#section-4.1-2.5.2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-4.1-2.5.2.2">By replacing the MUD URL in their network infrastructure.<a href="#section-4.1-2.5.2.2" class="pilcrow">¶</a>
+              <li class="normal" id="section-4.1-2.5.2.2">
+                <p id="section-4.1-2.5.2.2.1">By replacing the MUD URL in their network infrastructure.<a href="#section-4.1-2.5.2.2.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
-          <li class="normal" id="section-4.1-2.6">Devices can be quarantined if the Attestation Result indicates that an out-dated or compromised software/firmware version has been used.<a href="#section-4.1-2.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.6">
+            <p id="section-4.1-2.6.1">Devices can be quarantined if the Attestation Result indicates that an out-dated or compromised software/firmware version has been used.<a href="#section-4.1-2.6.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-4.1-2.7">Devices cannot lie about which MUD URL to use.<a href="#section-4.1-2.7" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.1-2.7">
+            <p id="section-4.1-2.7.1">Devices cannot lie about which MUD URL to use.<a href="#section-4.1-2.7.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -1540,7 +1572,21 @@ retrieving the manifest, the MUD file can be obtained as well.<a href="#section-
         <h3 id="name-cons">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-cons" class="section-name selfRef">Cons</a>
         </h3>
-<p id="section-4.2-1">This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself. The SUIT manifest must then be conveyed to the network during onboarding or during the network access authentication step. Attestation Evidence is used to convey the SUIT manifest.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-1">This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2-2.1">
+            <p id="section-4.2-2.1.1">MUD Manager must be aware of the Status Tracker or vice versa so that the MUD Manager can obtain MUD URLs and MUD Signer SKIs from the Status Tracker. This implies a new API in the MUD manager or Status Tracker.<a href="#section-4.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.2-2.2">
+            <p id="section-4.2-2.2.1">The MUD manager requires a failover mechanism to trigger the status tracker to obtain a copy of the SUIT Manifest in order to extract the MUD URL if it is not already aware of a device. This could be done, for example, as a part of an onboarding flow.<a href="#section-4.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.2-2.3">
+            <p id="section-4.2-2.3.1">Attestation Evidence may convey the SUIT Manifest, in which case the Status Tracker becomes a Relying Party since it depends on Attestation Evidence. This workflow is expected, however.<a href="#section-4.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.2-2.4">
+            <p id="section-4.2-2.4.1">This approach explicitly moves the decisions about device behaviour away from the Network Operator and towards the Manifest Author. While this is appropriate when the Manifest Author is trusted, not all IoT devices are fully trusted, and MUD files enable a Network Operator to restrict their capabilities. For a Network Operator to override a device's manufacturer-provided MUD URL will require the MUD manager to have a mechanism to enable this override, which adds complexity<a href="#section-4.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
 </section>
 </div>
 </section>
@@ -1561,6 +1607,8 @@ The subject key identifier corresponds to the key used in the MUD signature file
 $$unseverable-manifest-member-extensions //= (
   suit-manifest-mud =&gt; bstr .cbor SUIT_MUD_container
 )
+
+suit-manifest-mud = 25
 </pre><a href="#section-5-5" class="pilcrow">¶</a>
 </div>
 <p id="section-5-6">The SUIT_MUD_container structure is defined as follows:<a href="#section-5-6" class="pilcrow">¶</a></p>
@@ -1570,6 +1618,9 @@ SUIT_MUD_container = {
     suit-mud-url =&gt; #6.32(tstr),
     suit-mud-ski =&gt; SUIT_Digest,
 }
+
+suit-mud-url = 1
+suit-mud-ski = 2
 </pre><a href="#section-5-7" class="pilcrow">¶</a>
 </div>
 </section>
@@ -1584,11 +1635,13 @@ SUIT_MUD_container = {
 <p id="section-6-3">If the MUD file and the software/firmware loaded onto the device gets out-of-sync a device may be firewalled and, with firewalling by networks in place, the device may stop functioning. This is, however,
 not a concern specific to this specification but rather to the use of MUD in general. Below are two mitigations:<a href="#section-6-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6-4.1">A manufacturer must update the MUD file in advance of network service or product changes so 
-that the new services can be supported. Because the MUD file is accessed by a URL means that it can be subsequently updated. This requires a MUD file being retrieved again. This handles the case when the device 
-is already deployed and in use.<a href="#section-6-4.1" class="pilcrow">¶</a>
+<li class="normal" id="section-6-4.1">
+          <p id="section-6-4.1.1">A manufacturer must update the MUD file in advance of network service or product changes so
+that the new services can be supported. Because the MUD file is accessed by a URL means that it can be subsequently updated. This requires a MUD file being retrieved again. This handles the case when the device
+is already deployed and in use.<a href="#section-6-4.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-6-4.2">There is a possibility that an IoT device has remained on-shelf inventory for an extended period, resulting in its MUD file being inaccessible at its previous location. This necessitates a decision on how to implement a fail-safe tailored to the particular environment.<a href="#section-6-4.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-6-4.2">
+          <p id="section-6-4.2.1">There is a possibility that an IoT device has remained on-shelf inventory for an extended period, resulting in its MUD file being inaccessible at its previous location. This necessitates a decision on how to implement a fail-safe tailored to the particular environment.<a href="#section-6-4.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
@@ -1600,11 +1653,14 @@ is already deployed and in use.<a href="#section-6-4.1" class="pilcrow">¶</a>
       </h2>
 <p id="section-7-1">IANA is requested to add a new value to the SUIT manifest elements registry created with <span>[<a href="#I-D.ietf-suit-manifest" class="cite xref">I-D.ietf-suit-manifest</a>]</span>:<a href="#section-7-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7-2.1">Label: TBD1 [[Value allocated from the standards action address range]]<a href="#section-7-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-7-2.1">
+          <p id="section-7-2.1.1">Label: 25<a href="#section-7-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-7-2.2">Name: Manufacturer Usage Description (MUD)<a href="#section-7-2.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-7-2.2">
+          <p id="section-7-2.2.1">Name: Manufacturer Usage Description (MUD)<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-7-2.3">Reference: [[TBD: This document]]<a href="#section-7-2.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-7-2.3">
+          <p id="section-7-2.3.1">Reference: [[TBD: This document]]<a href="#section-7-2.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
@@ -1620,15 +1676,15 @@ is already deployed and in use.<a href="#section-6-4.1" class="pilcrow">¶</a>
 <dl class="references">
 <dt id="I-D.ietf-cose-key-thumbprint">[I-D.ietf-cose-key-thumbprint]</dt>
         <dd>
-<span class="refAuthor">Isobe, K.</span>, <span class="refAuthor">Tschofenig, H.</span>, and <span class="refAuthor">O. Steele</span>, <span class="refTitle">"CBOR Object Signing and Encryption (COSE) Key Thumbprint"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-cose-key-thumbprint-05</span>, <time datetime="2024-07-08" class="refDate">8 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-05">https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-05</a>&gt;</span>. </dd>
+<span class="refAuthor">Isobe, K.</span>, <span class="refAuthor">Tschofenig, H.</span>, and <span class="refAuthor">O. Steele</span>, <span class="refTitle">"CBOR Object Signing and Encryption (COSE) Key Thumbprint"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-cose-key-thumbprint-06</span>, <time datetime="2024-09-06" class="refDate">6 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-06">https://datatracker.ietf.org/doc/html/draft-ietf-cose-key-thumbprint-06</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-rats-eat">[I-D.ietf-rats-eat]</dt>
         <dd>
-<span class="refAuthor">Lundblade, L.</span>, <span class="refAuthor">Mandyam, G.</span>, <span class="refAuthor">O'Donoghue, J.</span>, and <span class="refAuthor">C. Wallace</span>, <span class="refTitle">"The Entity Attestation Token (EAT)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-eat-29</span>, <time datetime="2024-07-08" class="refDate">8 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-29">https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-29</a>&gt;</span>. </dd>
+<span class="refAuthor">Lundblade, L.</span>, <span class="refAuthor">Mandyam, G.</span>, <span class="refAuthor">O'Donoghue, J.</span>, and <span class="refAuthor">C. Wallace</span>, <span class="refTitle">"The Entity Attestation Token (EAT)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-eat-31</span>, <time datetime="2024-09-06" class="refDate">6 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-31">https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-31</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-suit-manifest">[I-D.ietf-suit-manifest]</dt>
         <dd>
-<span class="refAuthor">Moran, B.</span>, <span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Zandberg, K.</span>, and <span class="refAuthor">O. Rønningstad</span>, <span class="refTitle">"A Concise Binary Object Representation (CBOR)-based Serialization Format for the Software Updates for Internet of Things (SUIT) Manifest"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-suit-manifest-25</span>, <time datetime="2024-02-05" class="refDate">5 February 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-suit-manifest-25">https://datatracker.ietf.org/doc/html/draft-ietf-suit-manifest-25</a>&gt;</span>. </dd>
+<span class="refAuthor">Moran, B.</span>, <span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Zandberg, K.</span>, and <span class="refAuthor">O. Rønningstad</span>, <span class="refTitle">"A Concise Binary Object Representation (CBOR)-based Serialization Format for the Software Updates for Internet of Things (SUIT) Manifest"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-suit-manifest-33</span>, <time datetime="2025-02-24" class="refDate">24 February 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-suit-manifest-33">https://datatracker.ietf.org/doc/html/draft-ietf-suit-manifest-33</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
@@ -1663,11 +1719,11 @@ is already deployed and in use.<a href="#section-6-4.1" class="pilcrow">¶</a>
 <dd class="break"></dd>
 <dt id="I-D.fossati-tls-attestation">[I-D.fossati-tls-attestation]</dt>
         <dd>
-<span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Howard, P.</span>, <span class="refAuthor">Mihalcea, I.</span>, <span class="refAuthor">Deshpande, Y.</span>, <span class="refAuthor">Niemi, A.</span>, and <span class="refAuthor">T. Fossati</span>, <span class="refTitle">"Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-fossati-tls-attestation-07</span>, <time datetime="2024-07-08" class="refDate">8 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-fossati-tls-attestation-07">https://datatracker.ietf.org/doc/html/draft-fossati-tls-attestation-07</a>&gt;</span>. </dd>
+<span class="refAuthor">Tschofenig, H.</span>, <span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Howard, P.</span>, <span class="refAuthor">Mihalcea, I.</span>, <span class="refAuthor">Deshpande, Y.</span>, <span class="refAuthor">Niemi, A.</span>, and <span class="refAuthor">T. Fossati</span>, <span class="refTitle">"Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-fossati-tls-attestation-08</span>, <time datetime="2024-10-21" class="refDate">21 October 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-fossati-tls-attestation-08">https://datatracker.ietf.org/doc/html/draft-fossati-tls-attestation-08</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-opsawg-mud-acceptable-urls">[I-D.ietf-opsawg-mud-acceptable-urls]</dt>
         <dd>
-<span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Pan, W.</span>, and <span class="refAuthor">E. Lear</span>, <span class="refTitle">"Authorized update to MUD URLs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-opsawg-mud-acceptable-urls-11</span>, <time datetime="2024-03-01" class="refDate">1 March 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-opsawg-mud-acceptable-urls-11">https://datatracker.ietf.org/doc/html/draft-ietf-opsawg-mud-acceptable-urls-11</a>&gt;</span>. </dd>
+<span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Pan, W.</span>, and <span class="refAuthor">E. Lear</span>, <span class="refTitle">"Authorized update to MUD URLs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-opsawg-mud-acceptable-urls-12</span>, <time datetime="2024-09-06" class="refDate">6 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-opsawg-mud-acceptable-urls-12">https://datatracker.ietf.org/doc/html/draft-ietf-opsawg-mud-acceptable-urls-12</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC5280">[RFC5280]</dt>
         <dd>

@@ -2,7 +2,8 @@
 title: Strong Assertions of IoT Network Access Requirements
 abbrev: SUIT MUD Linkage
 updates: draft-ietf-suit-manifest
-docname: draft-ietf-suit-mud-09
+docname: draft-ietf-suit-mud-11
+date: 2026-11-02
 category: std
 
 ipr: trust200902
@@ -98,7 +99,7 @@ RFC 8520 envisions different approaches for conveying the MUD URL from the devic
 
 - DHCP,
 - IEEE 802.1AB Link Layer Discovery Protocol (LLDP), and
-- IEEE 802.1X whereby the URL to the MUD file would be contained in the certificate used in an EAP method.
+- Device Certificates, such as IEEE 802.1X, whereby the URL to the MUD File would be contained in the certificate.
 
 The MUD manager must trust the MUD file server from which the MUD file is fetched to return the most up-to-date MUD file.
 It must also trust the device to report the correct MUD URL. In case of DHCP and LLDP the URL is unprotected and not bound
@@ -114,7 +115,7 @@ to include a MUD URL. A SUIT manifest is
    devices to which it applies, and cryptographic information protecting
    the manifest.
 
- When combining a MUD URL with a manifest used for software/firmware updates then a network operator can gain
+ When combining a MUD URL with a manifest used for software/firmware updates then a network operator has
 more confidence in the description of the communication requirements for a device to properly function.
 
 # Terminology
@@ -216,7 +217,12 @@ The approach described in this document has several advantages over the RFC 8520
 
 ## Cons
 
-This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself. The SUIT manifest must then be conveyed to the network during onboarding or during the network access authentication step. Attestation Evidence is used to convey the SUIT manifest. 
+This mechanism relies on the use of SUIT manifests to encode the MUD URL. Conceptually, the MUD file is similar to a Software Bill of Material (SBOM) but focuses on the external visible communication behavior, which is essential for network operators, rather than describing the software libraries contained within the device itself.
+
+* MUD Manager must be aware of the Status Tracker or vice versa so that the MUD Manager can obtain MUD URLs and MUD Signer SKIs from the Status Tracker. This implies a new API in the MUD manager or Status Tracker.
+* The MUD manager requires a failover mechanism to trigger the status tracker to obtain a copy of the SUIT Manifest in order to extract the MUD URL if it is not already aware of a device. This could be done, for example, as a part of an onboarding flow.
+* Attestation Evidence may convey the SUIT Manifest, in which case the Status Tracker becomes a Relying Party since it depends on Attestation Evidence. This workflow is expected, however.
+* This approach explicitly moves the decisions about device behaviour away from the Network Operator and towards the Manifest Author. While this is appropriate when the Manifest Author is trusted, not all IoT devices are fully trusted, and MUD files enable a Network Operator to restrict their capabilities. For a Network Operator to override a device's manufacturer-provided MUD URL will require the MUD manager to have a mechanism to enable this override, which adds complexity
 
 # Extensions to SUIT {#suit-extension}
 
@@ -234,6 +240,8 @@ The extension to the SUIT_Manifest is described here:
 $$unseverable-manifest-member-extensions //= (
   suit-manifest-mud => bstr .cbor SUIT_MUD_container
 )
+
+suit-manifest-mud = 25
 ~~~
 
 The SUIT_MUD_container structure is defined as follows:
@@ -243,6 +251,9 @@ SUIT_MUD_container = {
     suit-mud-url => #6.32(tstr),
     suit-mud-ski => SUIT_Digest,
 }
+
+suit-mud-url = 1
+suit-mud-ski = 2
 ~~~
 
 # Security Considerations
@@ -264,7 +275,7 @@ is already deployed and in use.
 
 IANA is requested to add a new value to the SUIT manifest elements registry created with {{I-D.ietf-suit-manifest}}:
 
-- Label: TBD1 [[Value allocated from the standards action address range]]
+- Label: 25
 - Name: Manufacturer Usage Description (MUD)
 - Reference: [[TBD: This document]]
 
